@@ -1,0 +1,3 @@
+﻿proc(main, $args)
+	$argCnt = arrsize($args)
+end_proc
