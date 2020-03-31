@@ -12,6 +12,10 @@ END_PROC
 	:	E N D '_' P R O C
 	;
 
+RETURN
+	:	R E T U R N
+	;
+
 FOR
 	:	F O R
 	;
@@ -126,10 +130,12 @@ DOLLAR
 	;
 
 WS
-	:	' ' -> channel(HIDDEN)
+	:	(' '| '\t') -> channel(HIDDEN)
 	;
 
-NEWLINE: ('\n'|'\r'|'\r\n');
+NEWLINE
+	:	('\n'|'\r'|'\r\n')
+	;
 
 
 

@@ -94,6 +94,15 @@
     <Compile Include="CmanParser.g4.cs">
       <DependentUpon>CmanParser.g4</DependentUpon>
     </Compile>
+    <Compile Include="ASTParser\ASTBuilderListener.cs" />
+    <Compile Include="ASTParser\AST\ASTBodyNode.cs" />
+    <Compile Include="ASTParser\AST\ASTCallStatementNode.cs" />
+    <Compile Include="ASTParser\AST\ASTCompilationUnitNode.cs" />
+    <Compile Include="ASTParser\AST\ASTNode.cs" />
+    <Compile Include="ASTParser\AST\ASTProcNode.cs" />
+    <Compile Include="ASTParser\AST\ASTStatementNode.cs" />
+    <Compile Include="ASTParser\AST\ASTVariableNode.cs" />
+    <Compile Include="ASTParser\AST\ASTWhileStatementNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\SourceProvider.cs" />
