@@ -10,12 +10,12 @@ compileUnit
 
 procStatement
 	:	PROC LR_BRACKET name argListDecl? RR_BRACKET NEWLINE+
-			bodyStatement
+			(bodyStatement)?
 		END_PROC
 	;
 
 bodyStatement
-	:	((assignStatement | whileStatement | procCallStatement) NEWLINE+)*
+	:	((assignStatement | whileStatement | procCallStatement) NEWLINE+)+
 	;
 
 assignStatement
@@ -53,6 +53,9 @@ expr
 	|	procCallStatement
 	|	stringLiteral
 	|	numberLiteral
+	
+	|	expr indexStatement
+
 	|	unarOp expr
 	|	expr mulOrDivOp expr
 	|	expr addOrSubOp expr
@@ -66,6 +69,10 @@ varOrExpr
 
 var
 	:	DOLLAR name
+	;
+//?
+indexStatement
+	:	LS_BRACKET expr RS_BRACKET
 	;
 
 name

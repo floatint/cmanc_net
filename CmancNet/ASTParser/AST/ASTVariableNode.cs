@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace CmancNet.ASTParser.AST
 {
-    class ASTVariableNode : ASTNode
+    class ASTVariableNode : ASTExpressionNode
     {
         public string Name { set; get; }
 
-        public ASTVariableNode(ASTNode parent) : base(parent)
+        public ASTVariableNode(CmanParser.VarContext context, ASTNode parent) : base(parent)
         {
-
+            Name = context.children.First(x => x is CmanParser.NameContext).GetText();
+            SetLocation(context);
         }
     }
 }

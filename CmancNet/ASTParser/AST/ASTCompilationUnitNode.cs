@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace CmancNet.ASTParser.AST
 {
@@ -11,9 +12,11 @@ namespace CmancNet.ASTParser.AST
         public IList<ASTProcNode> Procedures { set; get; }
         public string Name { set; get; }
 
-        public ASTCompilationUnitNode(string name) : base(null)
+
+        public ASTCompilationUnitNode(CmanParser.CompileUnitContext context) : base(null)
         {
-            Name = name;
+            Name = Path.GetFileNameWithoutExtension(context.start.InputStream.SourceName);
+            SetLocation(context);
             Procedures = new List<ASTProcNode>();
         }
     }

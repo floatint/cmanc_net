@@ -11,83 +11,105 @@ namespace CmancNet.ASTParser
 {
     class ASTBuilderListener : CmanParserBaseListener
     {
+        //current procudure
         private ASTProcNode _currentProc;
+        //code blocks stack
+        private Stack<ASTBodyNode> _codeBlocks;
+
+        private Tuple<ParserRuleContext, ASTExpressionNode> _currentExpression;
+
+        private ASTStatementNode _currentStatement;
         
 
-        private Stack<ASTBodyNode> Blocks { set; get; }
-        public ASTCompilationUnitNode BuiltAST { set; get; }
+        private List<ASTExpressionNode> _expresions;
+
+        public ASTCompilationUnitNode CompilationUnit { set; get; }
 
         public ASTBuilderListener()
         {
-            Blocks = new Stack<ASTBodyNode>();
+            _codeBlocks = new Stack<ASTBodyNode>();
         }
 
         public override void EnterCompileUnit([NotNull] CmanParser.CompileUnitContext context)
         {
-            BuiltAST = new ASTCompilationUnitNode(context.Start.InputStream.SourceName);
-            BuiltAST.SetLocation(context.Start.Line, context.Start.Column, context.Stop.Line, context.Stop.Column);
-            var procs = context.children.Where(x => x is CmanParser.ProcStatementContext).ToList();
-            if (procs.Count != 0)
-            {
-                foreach (var p in procs)
-                {
-                    EnterProcStatement((CmanParser.ProcStatementContext)p);
-                }
-            }
-            else
-            {
-                //log
-            }
-            return;
+            CompilationUnit = new ASTCompilationUnitNode(context);
         }
 
         public override void EnterProcStatement([NotNull] CmanParser.ProcStatementContext context)
         {
-            Console.WriteLine("proc" + context.children.First(x => x is CmanParser.NameContext).GetText());
-            ASTProcNode proc = new ASTProcNode(BuiltAST);
-            proc.Name = context.children.First(x => x is CmanParser.NameContext).GetText();
-            BuiltAST.Procedures.Add(proc);
-            var body = (ParserRuleContext)context.children.First(x => x is CmanParser.BodyStatementContext);
-            //ASTBodyNode bodyNode = new ASTBodyNode(proc);
-            //CurrentBlock.Push(bodyNode);
-            EnterBodyStatement((CmanParser.BodyStatementContext)body);
-            //BuiltAST.Procedures.Last().Body = bodyNode;
+            _currentProc = new ASTProcNode(context, CompilationUnit);
+        }
+
+        public override void ExitProcStatement([NotNull] CmanParser.ProcStatementContext context)
+        {
+            CompilationUnit.Procedures.Add(_currentProc);
+            _currentProc = null;
         }
 
         public override void EnterBodyStatement([NotNull] CmanParser.BodyStatementContext context)
         {
-            if (context.children != null)
+            //if no has proc dody, loops
+            if (_codeBlocks.Count == 0)
             {
-                ASTNode parent;
-                //если тело принадлежит процедуре
-                if (Blocks.Count == 0)
-                {
-                    parent = BuiltAST.Procedures.Last();
-                }
-                else //Если тело принадлежит циклу
-                {
-                    parent = Blocks.Peek();
-                }
-               
-                var bodyNode = new ASTBodyNode(parent);
-                if (parent is ASTProcNode)
-                    ((ASTProcNode)parent).Body = bodyNode;
-
-                Blocks.Push(bodyNode);
-
-                foreach (var c in context.children)
-                {
-                    if (c is CmanParser.AssignStatementContext)
-                        EnterAssignStatement((CmanParser.AssignStatementContext)c);
-                    if (c is CmanParser.WhileStatementContext)
-                        EnterWhileStatement((CmanParser.WhileStatementContext)c);
-                }
+                _codeBlocks.Push(new ASTBodyNode(context, _currentProc));
+            }
+            else
+            {
+                _codeBlocks.Push(new ASTBodyNode(context, _codeBlocks.Peek()));
             }
         }
 
         public override void ExitBodyStatement([NotNull] CmanParser.BodyStatementContext context)
         {
-            Blocks.Pop();
+            if (_codeBlocks.Count == 1)
+            {
+                _currentProc.Body = _codeBlocks.Peek();
+            }
+            _codeBlocks.Pop();
+        }
+
+        /*
+         * Высокоуровневый обработчик.
+         * 
+         *
+         */
+        public override void EnterExpr([NotNull] CmanParser.ExprContext context)
+        {
+            if (_currentExpression == null)
+            {
+                _currentExpression = new Tuple<ParserRuleContext, ASTExpressionNode>(
+                    context,
+                    ASTExpressionNode.BuildExpressionSubTree(context, _currentStatement));
+            }    
+            var children = context.children;
+            Console.WriteLine(context.GetText());
+            foreach (var c in children)
+            {
+                Console.WriteLine(c.GetText() + ' ' + c.GetType());
+            }
+            Console.WriteLine("============================");
+            return;
+            //var, literal or func call
+            if (context.ChildCount == 1)
+            {
+                //Console.WriteLine(context.GetChild(0).GetType());
+                if (context.GetChild(0) is CmanParser.VarOrExprContext)
+                {
+                    if (context.GetChild(0).GetChild(0) is CmanParser.VarContext)
+                        Console.WriteLine("variable");
+                }
+                if (context.GetChild(0) is CmanParser.NumberLiteralContext)
+                    Console.WriteLine("number");
+                if (context.GetChild(0) is CmanParser.StringLiteralContext)
+                    Console.WriteLine("string");
+            }
+            //_expresions.Add(new ASTExpressionNode(context, null));
+            
+        }
+
+        public override void EnterIndexStatement([NotNull] CmanParser.IndexStatementContext context)
+        {
+            //Console.WriteLine(context.GetText() + ' ' + context.Parent.GetText() + ' ' + context.Parent.GetChild(0).GetText());
         }
 
         public override void EnterAssignStatement([NotNull] CmanParser.AssignStatementContext context)

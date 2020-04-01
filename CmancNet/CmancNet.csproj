@@ -88,6 +88,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASTParser\AST\ASTAssignStatementNode.cs" />
+    <Compile Include="ASTParser\AST\ASTExpressionNode.cs" />
+    <Compile Include="ASTParser\AST\ASTIndexOpNode.cs" />
+    <Compile Include="ASTParser\AST\ASTNumberLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\ASTStringLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\ASTUnarMinusOpNode.cs" />
     <Compile Include="CmanLexer.g4.cs">
       <DependentUpon>CmanLexer.g4</DependentUpon>
     </Compile>

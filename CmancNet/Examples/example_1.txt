@@ -1,4 +1,5 @@
 ﻿proc(test)
+$a = $c[0][2][7]
 end_proc
 
 proc(add, $a, $b)
