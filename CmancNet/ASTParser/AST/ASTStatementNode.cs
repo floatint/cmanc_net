@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmancNet.ASTParser.AST
 {
-    class ASTStatementNode : ASTNode
+    class ASTStatementNode : ASTExpressionNode
     {
         public ASTStatementNode(ASTNode parent) : base(parent)
         {

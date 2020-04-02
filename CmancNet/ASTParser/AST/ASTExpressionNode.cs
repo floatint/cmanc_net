@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Antlr4.Runtime;
 
 namespace CmancNet.ASTParser.AST
 {
@@ -25,6 +26,26 @@ namespace CmancNet.ASTParser.AST
                     return new ASTStringLiteralNode((CmanParser.StringLiteralContext)child, parent);
                 if (child is CmanParser.NumberLiteralContext)
                     return new ASTNumberLiteralNode((CmanParser.NumberLiteralContext)child, parent);
+                if (child is CmanParser.ProcCallStatementContext callContext)
+                {
+                    var callNode = new ASTCallStatementNode((CmanParser.ProcCallStatementContext)child, parent);
+                    var exprList = callContext.children.FirstOrDefault(x => x is CmanParser.ExprListContext);
+                    if (exprList != null)
+                    {
+                        var argList = ((ParserRuleContext)exprList).children.Where(x => x is CmanParser.ExprContext).ToList();
+                        callNode.Arguments = new List<ASTExpressionNode>();
+                        foreach (var e in argList)
+                        {
+                            callNode.Arguments.Add(
+                                    BuildExpressionSubTree(
+                                    (CmanParser.ExprContext)e,
+                                    callNode
+                                    )
+                                );
+                        }
+                    }
+                    node = callNode;
+                }
                 if (child is CmanParser.VarOrExprContext)
                 {
                     var subChild = child.GetChild(0);

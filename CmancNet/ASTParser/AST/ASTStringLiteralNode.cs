@@ -14,7 +14,7 @@ namespace CmancNet.ASTParser.AST
             : base(parent)
         {
             SetLocation(context);
-            Value = context.STRING().GetText();
+            Value = context.STRING().GetText().Trim(new char[] { '"' });
         }
     }
 }
