@@ -18,8 +18,8 @@ namespace CmancNet.ASTParser.AST
     class ASTAssignStatementNode : ASTStatementNode
     {
         //may be expression ?
-        public ASTStatementNode Left { set; get; }
-        public ASTStatementNode Right { set; get; }
+        public ASTExpressionNode Left { set; get; }
+        public ASTExpressionNode Right { set; get; }
 
         public ASTAssignStatementNode(CmanParser.AssignStatementContext context, ASTNode parent)
             : base(parent)

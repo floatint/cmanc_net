@@ -15,11 +15,11 @@ procStatement
 	;
 
 bodyStatement
-	:	((assignStatement | whileStatement | procCallStatement) NEWLINE+)+
+	:	((assignStatement | whileStatement | procCallStatement | returnStatement) NEWLINE+)+
 	;
 
 assignStatement
-	:	var ASSIGN expr
+	:	expr ASSIGN expr
 	;
 
 returnStatement
@@ -54,7 +54,7 @@ expr
 	|	stringLiteral
 	|	numberLiteral
 	
-	|	expr indexStatement
+	|	expr indexOp
 
 	|	unarOp expr
 	|	expr mulOrDivOp expr
@@ -70,8 +70,9 @@ varOrExpr
 var
 	:	DOLLAR name
 	;
-//?
-indexStatement
+
+
+indexOp
 	:	LS_BRACKET expr RS_BRACKET
 	;
 

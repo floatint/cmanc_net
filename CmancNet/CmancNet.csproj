@@ -94,6 +94,7 @@
     <Compile Include="ASTParser\AST\ASTNumberLiteralNode.cs" />
     <Compile Include="ASTParser\AST\ASTStringLiteralNode.cs" />
     <Compile Include="ASTParser\AST\ASTUnarMinusOpNode.cs" />
+    <Compile Include="ASTParser\AST\ASTUnarNotOpNode.cs" />
     <Compile Include="CmanLexer.g4.cs">
       <DependentUpon>CmanLexer.g4</DependentUpon>
     </Compile>
