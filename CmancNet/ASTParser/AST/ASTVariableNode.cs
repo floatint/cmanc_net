@@ -12,8 +12,15 @@ namespace CmancNet.ASTParser.AST
 
         public ASTVariableNode(CmanParser.VarContext context, ASTNode parent) : base(parent)
         {
-            Name = context.children.First(x => x is CmanParser.NameContext).GetText();
             SetLocation(context);
+            Name = context.children.First(x => x is CmanParser.NameContext).GetText();
+        }
+
+        public override IList<ASTNode> Children => new List<ASTNode>();
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1})", GetType().Name, Name);
         }
     }
 }

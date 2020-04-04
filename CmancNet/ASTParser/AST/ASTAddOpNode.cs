@@ -6,18 +6,17 @@ using System.Threading.Tasks;
 
 namespace CmancNet.ASTParser.AST
 {
-    class ASTAssignStatementNode : ASTStatementNode
+    class ASTAddOpNode : ASTExpressionNode
     {
         public ASTExpressionNode Left { set; get; }
         public ASTExpressionNode Right { set; get; }
 
-        public override IList<ASTNode> Children => new List<ASTNode> { Left, Right };
-
-        public ASTAssignStatementNode(CmanParser.AssignStatementContext context, ASTNode parent)
+        public ASTAddOpNode(CmanParser.AddOrSubOpContext context, ASTNode parent)
             : base(parent)
         {
-            SetLocation(context);
+            SetLocation(context); 
         }
 
+        public override IList<ASTNode> Children => new List<ASTNode> { Left, Right };
     }
 }

@@ -11,6 +11,14 @@ namespace CmancNet.ASTParser.AST
         public ASTExpressionNode Expression { set; get; }
         public ASTExpressionNode Index { set; get; }
 
+        public override IList<ASTNode> Children => new List<ASTNode> { Expression, Index };
+
+        public ASTIndexOpNode(CmanParser.IndexOpContext context, ASTNode parent)
+            : base(parent)
+        {
+            SetLocation(context);
+        }
+
         public ASTIndexOpNode(CmanParser.ExprContext context, ASTExpressionNode expr, ASTExpressionNode index, ASTNode parent)
             : base(parent)
         {

@@ -88,13 +88,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASTParser\AST\ASTAddOpNode.cs" />
+    <Compile Include="ASTParser\AST\ASTArgListNode.cs" />
     <Compile Include="ASTParser\AST\ASTAssignStatementNode.cs" />
     <Compile Include="ASTParser\AST\ASTExpressionNode.cs" />
     <Compile Include="ASTParser\AST\ASTIndexOpNode.cs" />
     <Compile Include="ASTParser\AST\ASTNumberLiteralNode.cs" />
     <Compile Include="ASTParser\AST\ASTStringLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\ASTSubOpNode.cs" />
     <Compile Include="ASTParser\AST\ASTUnarMinusOpNode.cs" />
     <Compile Include="ASTParser\AST\ASTUnarNotOpNode.cs" />
+    <Compile Include="ASTParser\AST\IASTBinaryOpNode.cs" />
     <Compile Include="CmanLexer.g4.cs">
       <DependentUpon>CmanLexer.g4</DependentUpon>
     </Compile>
@@ -112,6 +116,7 @@
     <Compile Include="ASTParser\AST\ASTWhileStatementNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ASTPrinter.cs" />
     <Compile Include="Utils\SourceProvider.cs" />
   </ItemGroup>
   <ItemGroup>

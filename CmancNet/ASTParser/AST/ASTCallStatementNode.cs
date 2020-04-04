@@ -16,7 +16,9 @@ namespace CmancNet.ASTParser.AST
         {
             SetLocation(context);
             ProcedureName = context.children.First(x => x is CmanParser.NameContext).GetText();
-            //TODO: args parsing
         }
+
+        public override IList<ASTNode> Children => new List<ASTNode>();
+
     }
 }

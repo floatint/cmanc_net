@@ -10,6 +10,8 @@ namespace CmancNet.ASTParser.AST
     {
         public IList<ASTStatementNode> Statements { set; get; }
 
+        public override IList<ASTNode> Children => Statements.ToList<ASTNode>();
+
         public ASTBodyNode(CmanParser.BodyStatementContext context, ASTNode parent) : base(parent)
         {
             SetLocation(context);

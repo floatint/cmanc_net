@@ -8,9 +8,16 @@ namespace CmancNet.ASTParser.AST
 {
     class ASTWhileStatementNode : ASTStatementNode
     {
-        public ASTWhileStatementNode(ASTNode parent, ASTNode condition, ASTNode body) : base(parent)
-        {
+        public ASTExpressionNode Condition { set; get; }
+        public ASTBodyNode Body { set; get; }
 
+        public ASTWhileStatementNode(CmanParser.WhileStatementContext context, ASTNode parent)
+            : base(parent)
+        {
+            SetLocation(context);
         }
+
+        public override IList<ASTNode> Children => new List<ASTNode> { Condition, Body };
+
     }
 }

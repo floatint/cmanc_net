@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace CmancNet.ASTParser.AST
 {
-    class ASTStatementNode : ASTExpressionNode
+    //TODO: сделать интерфейсом
+    abstract class ASTStatementNode : ASTExpressionNode
     {
         public ASTStatementNode(ASTNode parent) : base(parent)
         {

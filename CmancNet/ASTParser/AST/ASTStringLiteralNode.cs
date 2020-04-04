@@ -16,5 +16,12 @@ namespace CmancNet.ASTParser.AST
             SetLocation(context);
             Value = context.STRING().GetText().Trim(new char[] { '"' });
         }
+
+        public override IList<ASTNode> Children => new List<ASTNode>();
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1})", GetType().Name, Value);
+        }
     }
 }

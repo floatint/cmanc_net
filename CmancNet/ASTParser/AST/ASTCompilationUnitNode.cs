@@ -9,15 +9,34 @@ namespace CmancNet.ASTParser.AST
 {
     class ASTCompilationUnitNode : ASTNode
     {
-        public IList<ASTProcNode> Procedures { set; get; }
+        public IList<ASTProcNode> Procedures { get; private set; }
+
+        public override IList<ASTNode> Children {
+            get
+            {
+                return Procedures.ToList<ASTNode>();
+            }
+        }
+
         public string Name { set; get; }
 
+        public void AddProcedure(ASTProcNode p)
+        {
+            if (Procedures == null)
+                Procedures = new List<ASTProcNode>();
+            Procedures.Add(p);
+            
+        }
 
         public ASTCompilationUnitNode(CmanParser.CompileUnitContext context) : base(null)
         {
             Name = Path.GetFileNameWithoutExtension(context.start.InputStream.SourceName);
             SetLocation(context);
-            Procedures = new List<ASTProcNode>();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1})", GetType().Name, Name);
         }
     }
 }

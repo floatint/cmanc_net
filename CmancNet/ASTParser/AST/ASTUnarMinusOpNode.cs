@@ -10,11 +10,13 @@ namespace CmancNet.ASTParser.AST
     {
         public ASTExpressionNode Expression { set; get; }
 
-        public ASTUnarMinusOpNode(CmanParser.UnarOpContext context, ASTExpressionNode expr, ASTNode parent)
+        public ASTUnarMinusOpNode(CmanParser.UnarOpContext context, ASTNode parent)
             : base(parent)
         {
             SetLocation(context);
-            Expression = expr;
         }
+
+        public override IList<ASTNode> Children => new List<ASTNode> { Expression };
+
     }
 }

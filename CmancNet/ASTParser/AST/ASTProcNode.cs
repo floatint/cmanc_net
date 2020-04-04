@@ -11,23 +11,29 @@ namespace CmancNet.ASTParser.AST
     {
         public string Name { set; get; }
         public ASTBodyNode Body { set; get; }
-        public IList<ASTVariableNode> Arguments { set; get; }
+        public ASTArgListNode Arguments { set; get; }
 
-        public ASTProcNode(CmanParser.ProcStatementContext context, ASTCompilationUnitNode compileUnit)
-            : base(compileUnit)
+
+        public ASTProcNode(CmanParser.ProcStatementContext context, ASTNode parent)
+            : base(parent)
         {
-            Name = context.children.First(x => x is CmanParser.NameContext).GetText();
             SetLocation(context);
-            var argsDecl = context.children.FirstOrDefault(x => x is CmanParser.ArgListDeclContext);
-            if (argsDecl != null)
+            Name = context.children.First(x => x is CmanParser.NameContext).GetText();
+        }
+
+        public override IList<ASTNode> Children
+        {
+            get
             {
-                var argsList = ((ParserRuleContext)argsDecl).children.Where(x => x is CmanParser.VarContext).ToList();
-                Arguments = new List<ASTVariableNode>();
-                foreach (var a in argsList)
-                {
-                    Arguments.Add(new ASTVariableNode((CmanParser.VarContext)a, this));
-                }
-            } 
+                var list = new List<ASTNode> { Arguments, Body };
+                list.RemoveAll(x => x is null);
+                return list;
+            }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0} ({1})", GetType().Name, Name);
         }
     }
 }

@@ -23,7 +23,10 @@ namespace CmancNet
             var astBuilder = new ASTBuilderListener();
             walker.Walk(astBuilder, parseTree);
             var ast = astBuilder.CompilationUnit;
-            Console.WriteLine(parseTree.ToStringTree(parser));
+            //Console.WriteLine(ast.ToString());
+            //Console.WriteLine(parseTree.ToStringTree(parser));
+            Console.WriteLine(Utils.ASTPrinter.Print(ast));
+            System.IO.File.WriteAllText(string.Format("{0}_ast_listing.txt", ast.Name), Utils.ASTPrinter.Print(ast));
             return;
         }
     }

@@ -7,16 +7,11 @@ using Antlr4.Runtime;
 
 namespace CmancNet.ASTParser.AST
 {
-    class ASTNode
+    abstract class ASTNode
     {
         public ASTNode Parent { set; get; }
 
-        public IList<ASTNode> Children { set; get; }
-
-        public ASTNode GetChild(int index)
-        {
-            return Children.ElementAt(index);
-        }
+        public abstract IList<ASTNode> Children { get; }
 
         public int StartLine { set; get; }
         public int EndLine { set;  get; }
@@ -42,6 +37,11 @@ namespace CmancNet.ASTParser.AST
             EndLine = endLine;
             StartPos = startPos;
             EndPos = endPos;
+        }
+
+        public new virtual string ToString()
+        {
+            return GetType().Name;
         }
 
     }
