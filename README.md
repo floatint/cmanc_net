@@ -10,6 +10,25 @@
 
 Компиляция производится в CIL. Для парсинга использует ANTLR 4.
 
+### TODO list:
+ - [ ] AST Parser
+    - [x] Compilation unit
+    - [x] Procedure statement
+        - [x] Arguments list
+        - [ ] Return statement
+    - [x] Body statement
+    - [ ] Loops
+        - [ ] Break statement
+        - [ ] While loop
+        - [ ] For loop
+    - [x] Assign statement
+    - [x] Expressions
+    - [x] Procedure call's
+    - [x] Arithmatic operation (+, -, *, /)
+ - AST Processors
+ - Codegen
+ - Assemblies builder
+
 ## Примеры
 
 ### Пример 1
