@@ -23,7 +23,7 @@ namespace CmancNet.ASTParser.AST.Statements
             if (Statements == null)
                 Statements = new List<IASTStatementNode>();
             ((ASTNode)stmt).Parent = this;
-            Statements.Add(stmt);
+            Statements.Insert(0, stmt);
         }
     }
 }
