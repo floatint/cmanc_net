@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CmancNet.ASTParser.AST
+namespace CmancNet.ASTParser.AST.Expressions
 {
-    class ASTStringLiteralNode : ASTExpressionNode
+    class ASTStringLiteralNode : ASTNode, IASTExprNode
     {
         public string Value { set; get; }
 

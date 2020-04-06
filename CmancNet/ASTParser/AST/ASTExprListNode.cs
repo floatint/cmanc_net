@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CmancNet.ASTParser.AST.Expressions;
 
 namespace CmancNet.ASTParser.AST
 {
     class ASTExprListNode : ASTNode
     {
-        public IList<ASTExpressionNode> Expressions { get; private set; }
+        public IList<IASTExprNode> Expressions { get; private set; }
 
         public ASTExprListNode(CmanParser.ExprListContext context, ASTNode parent)
             : base(parent)
@@ -16,13 +17,14 @@ namespace CmancNet.ASTParser.AST
             SetLocation(context);
         }
 
-        public void AddExpression(ASTExpressionNode e)
+        public void AddExpression(IASTExprNode e)
         {
             if (Expressions == null)
-                Expressions = new List<ASTExpressionNode>();
-            Expressions.Add(e);
+                Expressions = new List<IASTExprNode>();
+            ((ASTNode)e).Parent = this;
+            Expressions.Insert(0, e);
         }
 
-        public override IList<ASTNode> Children => Expressions.ToList<ASTNode>();
+        public override IList<ASTNode> Children => Expressions.Cast<ASTNode>().ToList();
     }
 }

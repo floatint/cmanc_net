@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CmancNet.ASTParser.AST.Expressions;
 
 namespace CmancNet.ASTParser.AST
 {
@@ -22,7 +23,8 @@ namespace CmancNet.ASTParser.AST
         {
             if (Arguments == null)
                 Arguments = new List<ASTVariableNode>();
-            Arguments.Add(v);
+            v.Parent = this;
+            Arguments.Insert(0, v);
         }
     }
 }

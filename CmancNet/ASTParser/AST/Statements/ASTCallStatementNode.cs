@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CmancNet.ASTParser.AST.Expressions;
 
-namespace CmancNet.ASTParser.AST
+namespace CmancNet.ASTParser.AST.Statements
 {
-    class ASTCallStatementNode : ASTStatementNode
+    class ASTCallStatementNode : ASTNode, IASTStatementNode, IASTExprNode
     {
         public string ProcedureName { set; get; }
-        public IList<ASTExpressionNode> Arguments { set; get; }
+        public ASTExprListNode Arguments { set; get; }
 
         public ASTCallStatementNode(CmanParser.ProcCallStatementContext context, ASTNode parent) 
             : base(parent)
@@ -18,7 +19,11 @@ namespace CmancNet.ASTParser.AST
             ProcedureName = context.children.First(x => x is CmanParser.NameContext).GetText();
         }
 
-        public override IList<ASTNode> Children => new List<ASTNode>();
+        public override IList<ASTNode> Children => new List<ASTNode> { Arguments };
 
+        public override string ToString()
+        {
+            return string.Format("{0} ({1})", GetType().Name, ProcedureName);
+        }
     }
 }

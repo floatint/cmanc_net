@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Antlr4.Runtime;
 
-namespace CmancNet.ASTParser.AST
+namespace CmancNet.ASTParser.AST.Statements
 {
-    class ASTProcNode : ASTNode
+    class ASTProcStatementNode : ASTNode, IASTStatementNode
     {
         public string Name { set; get; }
-        public ASTBodyNode Body { set; get; }
+        public ASTBodyStatementNode Body { set; get; }
         public ASTArgListNode Arguments { set; get; }
 
 
-        public ASTProcNode(CmanParser.ProcStatementContext context, ASTNode parent)
+        public ASTProcStatementNode(CmanParser.ProcStatementContext context, ASTNode parent)
             : base(parent)
         {
             SetLocation(context);
