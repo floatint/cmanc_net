@@ -88,14 +88,38 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASTParser\AST\ASTArgListNode.cs" />
+    <Compile Include="ASTParser\AST\ASTExprListNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTAbstractBinOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTNumberLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTStringLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTVariableNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTAddOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTSubOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTBinOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTExprNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTUnarOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Unary\ASTIndexOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Unary\ASTMinusOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Unary\ASTNotOpNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTAssignStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTBodyStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTSubStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTWhileStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\IASTStatementNode.cs" />
     <Compile Include="CmanLexer.g4.cs">
       <DependentUpon>CmanLexer.g4</DependentUpon>
     </Compile>
     <Compile Include="CmanParser.g4.cs">
       <DependentUpon>CmanParser.g4</DependentUpon>
     </Compile>
+    <Compile Include="ASTParser\ASTBuilderListener.cs" />
+    <Compile Include="ASTParser\AST\ASTNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ASTPrinter.cs" />
     <Compile Include="Utils\SourceProvider.cs" />
   </ItemGroup>
   <ItemGroup>

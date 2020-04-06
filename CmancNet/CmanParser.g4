@@ -3,32 +3,37 @@ parser grammar CmanParser;
 options {tokenVocab = CmanLexer;}
 
 compileUnit
-	:	(procStatement)*
+	:	(NEWLINE* subStatement)*
+	|	NEWLINE*
+	|	EOF
 	;
 
 
-procStatement
-	:	PROC LR_BRACKET name argListDecl? RR_BRACKET NEWLINE+
-			(bodyStatement)*
-		END_PROC
+subStatement
+	:	SUB LR_BRACKET name argListDecl? RR_BRACKET NEWLINE+
+			(bodyStatement)?
+		END_SUB
 	;
 
 bodyStatement
-	:	(assignStatement | whileStatement | procCallStatement)
-		NEWLINE*
+	:	((assignStatement | whileStatement | subCallStatement | returnStatement) NEWLINE+)+
 	;
 
 assignStatement
-	:	var ASSIGN expr
+	:	expr ASSIGN expr
+	;
+
+returnStatement
+	:	RETURN expr?
 	;
 
 whileStatement
 	:	WHILE LR_BRACKET expr RR_BRACKET NEWLINE+
-			(bodyStatement)*
+			(bodyStatement)?
 		END_CYC
 	;
 
-procCallStatement
+subCallStatement
 	:	name LR_BRACKET exprList? RR_BRACKET
 	;
 
@@ -38,7 +43,7 @@ argListDecl
 	;
 
 exprList
-	:	expr (COMMA expr)
+	:	expr (COMMA expr)*
 	;
 
 expr
@@ -46,9 +51,12 @@ expr
 	|	true
 	|	false
 	|	varOrExpr
-	|	procCallStatement
+	|	subCallStatement
 	|	stringLiteral
 	|	numberLiteral
+	
+	|	expr indexOp
+
 	|	unarOp expr
 	|	expr mulOrDivOp expr
 	|	expr addOrSubOp expr
@@ -62,6 +70,11 @@ varOrExpr
 
 var
 	:	DOLLAR name
+	;
+
+
+indexOp
+	:	LS_BRACKET expr RS_BRACKET
 	;
 
 name
