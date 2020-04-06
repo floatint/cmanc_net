@@ -1,14 +1,14 @@
-﻿proc(test)
+﻿sub(test)
 $a = $c[0][2][7]
-end_proc
+end_sub
 
-proc(add, $a, $b)
+sub(add, $a, $b)
 	
 	$c = $a + $b
 
-end_proc
+end_sub
 
-proc(main, $args)
+sub(main, $args)
 	$argCnt = arrsize($args)
 	$num  = add(4,4)
-end_proc
+end_sub
