@@ -9,8 +9,28 @@ namespace CmancNet.ASTParser.AST.Statements
 {
     class ASTWhileStatementNode : ASTNode, IASTStatementNode
     {
-        public IASTExprNode Condition { set; get; }
-        public ASTBodyStatementNode Body { set; get; }
+        private IASTExprNode _condition;
+        private ASTBodyStatementNode _body;
+
+        public IASTExprNode Condition
+        {
+            set
+            {
+                ((ASTNode)value).Parent = this;
+                _condition = value;
+            }
+            get => _condition;
+        }
+
+        public ASTBodyStatementNode Body
+        {
+            set
+            {
+                value.Parent = this;
+                _body = value;
+            }
+            get => _body;
+        }
 
         public ASTWhileStatementNode(CmanParser.WhileStatementContext context, ASTNode parent)
             : base(parent)
@@ -18,8 +38,15 @@ namespace CmancNet.ASTParser.AST.Statements
             SetLocation(context);
         }
 
-        public override IList<ASTNode> Children => 
-            new List<ASTNode> { (ASTNode)Condition, Body };
+        public override IList<ASTNode> Children
+        {
+            get
+            {
+                var list = new List<ASTNode> { (ASTNode)Condition, Body };
+                list.RemoveAll(x => x is null);
+                return list;
+            }
+        }
 
     }
 }

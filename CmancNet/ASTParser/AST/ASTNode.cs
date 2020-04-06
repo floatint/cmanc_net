@@ -27,21 +27,22 @@ namespace CmancNet.ASTParser.AST
         {
             StartLine = context.Start.Line;
             StartPos = context.Start.Column + 1;
-            EndLine = context.Stop.Line;
-            EndPos = context.Stop.Column + 1;
-        }
-
-        public void SetLocation(int startLine, int endLine, int startPos, int endPos)
-        {
-            StartLine = startLine;
-            EndLine = endLine;
-            StartPos = startPos;
-            EndPos = endPos;
+            //if no have stop token. Start == Stop
+            if (context.Stop != null)
+            {
+                EndLine = context.Stop.Line;
+                EndPos = context.Stop.Column + 1;
+            }
+            else
+            {
+                EndLine = StartLine;
+                EndPos = StartPos;
+            }
         }
 
         public new virtual string ToString()
         {
-            return GetType().Name;
+            return string.Format("{0}({1},{2})", GetType().Name, StartLine, StartPos);//GetType().Name;
         }
 
     }

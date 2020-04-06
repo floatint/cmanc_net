@@ -9,7 +9,7 @@ namespace CmancNet.ASTParser.AST.Statements
 {
     class ASTCompileUnitNode : ASTNode, IASTStatementNode
     {
-        public IList<ASTProcStatementNode> Procedures { get; private set; }
+        public IList<ASTSubStatementNode> Procedures { get; private set; }
 
         public string Name { set; get; }
 
@@ -19,25 +19,20 @@ namespace CmancNet.ASTParser.AST.Statements
             SetLocation(context);
         }
 
-        public void AddProcedure(ASTProcStatementNode p)
+        public void AddProcedure(ASTSubStatementNode p)
         {
             if (Procedures == null)
-                Procedures = new List<ASTProcStatementNode>();
+                Procedures = new List<ASTSubStatementNode>();
             Procedures.Add(p);
 
         }
 
-        public override IList<ASTNode> Children
-        {
-            get
-            {
-                return Procedures.ToList<ASTNode>();
-            }
-        }
+        public override IList<ASTNode> Children =>
+            Procedures == null ? new List<ASTNode>() : Procedures.ToList<ASTNode>();
 
         public override string ToString()
         {
-            return string.Format("{0} ({1})", GetType().Name, Name);
+            return string.Format("{0}: [{1}]", base.ToString(), Name);
         }
     }
 }

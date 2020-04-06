@@ -106,7 +106,7 @@
     <Compile Include="ASTParser\AST\Statements\ASTBodyStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
-    <Compile Include="ASTParser\AST\Statements\ASTProcStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTSubStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTWhileStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\IASTStatementNode.cs" />
     <Compile Include="CmanLexer.g4.cs">

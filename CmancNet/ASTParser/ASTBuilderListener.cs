@@ -35,26 +35,26 @@ namespace CmancNet.ASTParser
             CompilationUnit = (ASTCompileUnitNode)_nodes.Pop();
         }
 
-        public override void EnterProcStatement([NotNull] CmanParser.ProcStatementContext context)
+        public override void EnterSubStatement([NotNull] CmanParser.SubStatementContext context)
         {
-            _nodes.Push(new ASTProcStatementNode(context, (ASTCompileUnitNode)_nodes.Peek()));
+            _nodes.Push(new ASTSubStatementNode(context, (ASTCompileUnitNode)_nodes.Peek()));
         }
 
-        public override void ExitProcStatement([NotNull] CmanParser.ProcStatementContext context)
+        public override void ExitSubStatement([NotNull] CmanParser.SubStatementContext context)
         {
-            ASTProcStatementNode procNode;
+            ASTSubStatementNode procNode;
             ASTBodyStatementNode bodyNode = null;
             if (_nodes.Peek() is ASTBodyStatementNode)
                 bodyNode = (ASTBodyStatementNode)_nodes.Pop();
             if (_nodes.Peek() is ASTArgListNode argListNode)
             {
                 _nodes.Pop();
-                procNode = (ASTProcStatementNode)_nodes.Pop();
+                procNode = (ASTSubStatementNode)_nodes.Pop();
                 procNode.Arguments = argListNode;
             }
             else
             {
-                procNode = (ASTProcStatementNode)_nodes.Pop();
+                procNode = (ASTSubStatementNode)_nodes.Pop();
             }
             procNode.Body = bodyNode;
 
@@ -90,7 +90,10 @@ namespace CmancNet.ASTParser
                 statements.Add((IASTStatementNode)_nodes.Pop());
             
             var bodyNode = (ASTBodyStatementNode)_nodes.Peek();
-            bodyNode.Statements = statements;
+            foreach (var s in statements)
+            {
+                bodyNode.AddStatement(s);
+            }
         }
 
         //Push variable node to stack
@@ -112,13 +115,13 @@ namespace CmancNet.ASTParser
         }
 
         //Push call statement to stack
-        public override void EnterProcCallStatement([NotNull] CmanParser.ProcCallStatementContext context)
+        public override void EnterSubCallStatement([NotNull] CmanParser.SubCallStatementContext context)
         {
             _nodes.Push(new ASTCallStatementNode(context, _nodes.Peek()));
         }
 
         //Pop call arguments
-        public override void ExitProcCallStatement([NotNull] CmanParser.ProcCallStatementContext context)
+        public override void ExitSubCallStatement([NotNull] CmanParser.SubCallStatementContext context)
         {
             if (_nodes.Peek() is ASTExprListNode exprListNode)
             {

@@ -4,12 +4,12 @@ lexer grammar CmanLexer;
 	Top level lexems
 */
 
-PROC
-	:	P R O C
+SUB
+	:	S U B
 	;
 
-END_PROC
-	:	E N D '_' P R O C
+END_SUB
+	:	E N D '_' S U B
 	;
 
 RETURN
@@ -136,7 +136,14 @@ WS
 NEWLINE
 	:	('\n'|'\r'|'\r\n')
 	;
+//
+BLOCK_COMMENT
+    :	'/*' .*? '*/' -> skip
+;
 
+LINE_COMMENT
+    :	'//' ~[\r\n]* -> skip
+	;
 
 
 fragment Exponent

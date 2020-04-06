@@ -9,8 +9,35 @@ namespace CmancNet.ASTParser.AST.Statements
 {
     class ASTAssignStatementNode : ASTNode, IASTStatementNode
     {
-        public IASTExprNode Left { set; get; }
-        public IASTExprNode Right { set; get; }
+        private IASTExprNode _left;
+        private IASTExprNode _right;
+
+        public IASTExprNode Left
+        {
+            set
+            {
+                ((ASTNode)value).Parent = this;
+                _left = value;
+            }
+            get
+            {
+                return _left;
+            }
+        }
+
+        public IASTExprNode Right
+        {
+            set
+            {
+                ((ASTNode)value).Parent = this;
+                _right = value;
+            }
+            get
+            {
+                return _right;
+            }
+        }
+
 
         public override IList<ASTNode> Children => 
             new List<ASTNode> { (ASTNode)Left, (ASTNode)Right };
