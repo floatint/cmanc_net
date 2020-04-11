@@ -16,9 +16,18 @@ namespace CmancNet.ASTParser
     class ASTBuilderListener : CmanParserBaseListener
     {
         //nodes stack
-        private Stack<ASTNode> _nodes; 
+        private Stack<ASTNode> _nodes;
 
         public ASTCompileUnitNode CompilationUnit { private set; get; }
+
+        public int ErrorsCount
+        {
+            get
+            {
+                return Errors.Count;
+            }
+        }
+        public IList<string> Errors { private set; get; }
 
         public ASTBuilderListener()
         {
@@ -50,7 +59,7 @@ namespace CmancNet.ASTParser
             {
                 _nodes.Pop();
                 procNode = (ASTSubStatementNode)_nodes.Pop();
-                procNode.Arguments = argListNode;
+                procNode.ArgList = argListNode;
             }
             else
             {
@@ -217,12 +226,35 @@ namespace CmancNet.ASTParser
                 _nodes.Push(new ASTAddOpNode(context, _nodes.Peek()));
         }
 
+        public override void EnterCompOp([NotNull] CmanParser.CompOpContext context)
+        {
+            if (context.GetText() == "<")
+                _nodes.Push(new ASTLessCmpOpNode(context, _nodes.Peek()));
+            if (context.GetText() == ">")
+                _nodes.Push(new ASTGreaterCmpOpNode(context, _nodes.Peek()));
+
+        }
+
+        //Bin operators handling
+        //TODO: rework for IASTBinOpNode
         public override void ExitExpr([NotNull] CmanParser.ExprContext context)
         {
             var t = context.GetText();
             //var op = _nodes.LastOrDefault(x => x is ASTAddOpNode || x is ASTSubOpNode);
             var op = _nodes.ElementAt(1); //get op node
-            if (op is ASTAddOpNode addNode)
+            if (op is IASTBinOpNode binOpNode)
+            {
+                if (binOpNode.Left == null && binOpNode.Right == null)
+                {
+                    var right = (IASTExprNode)_nodes.Pop();
+                    _nodes.Pop();
+                    var left = (IASTExprNode)_nodes.Pop();
+                    binOpNode.Left = left;
+                    binOpNode.Right = right;
+                    _nodes.Push(op);
+                }
+            }
+            /*if (op is ASTAddOpNode addNode)
             {
                 var right = (IASTExprNode)_nodes.Pop();
                 _nodes.Pop();
@@ -240,6 +272,25 @@ namespace CmancNet.ASTParser
                 subNode.Right = right;
                 _nodes.Push(op);
             }
+            if (op is ASTLessCmpOpNode lessCmpNode)
+            {
+                var right = (IASTExprNode)_nodes.Pop();
+                _nodes.Pop();
+                var left = (IASTExprNode)_nodes.Pop();
+                lessCmpNode.Left = left;
+                lessCmpNode.Right = right;
+                _nodes.Push(op);
+            }
+            if (op is ASTGreaterCmpOpNode greaterCmpNode)
+            {
+                var right = (IASTExprNode)_nodes.Pop();
+                _nodes.Pop();
+                var left = (IASTExprNode)_nodes.Pop();
+                greaterCmpNode.Left = left;
+                greaterCmpNode.Right = right;
+                _nodes.Push(op);
+            }*/
+
         }
 
         //
@@ -258,6 +309,47 @@ namespace CmancNet.ASTParser
             whileStmtNode = (ASTWhileStatementNode)_nodes.Peek();
             whileStmtNode.Body = bodyNode;
             whileStmtNode.Condition = condNode;
+        }
+
+        public override void EnterForStatement([NotNull] CmanParser.ForStatementContext context)
+        {
+            _nodes.Push(new ASTForStatementNode(context, _nodes.Peek()));
+            //base.EnterForStatement(context);
+        }
+
+        public override void ExitForStatement([NotNull] CmanParser.ForStatementContext context)
+        {
+            ASTBodyStatementNode body = null;
+            IASTExprNode step = null;
+            IASTExprNode cond = null;
+            ASTNode counter = null;
+            Queue<ASTNode> childs = new Queue<ASTNode>();
+            while (!(_nodes.Peek() is ASTForStatementNode))
+            {
+                childs.Enqueue(_nodes.Pop());
+                //childs.Push(_nodes.Pop());
+            }
+            
+            //has body
+            if (childs.Peek() is ASTBodyStatementNode)
+            {
+                body = (ASTBodyStatementNode)childs.Dequeue();
+            }
+            int childCount = childs.Count();
+            //counter, condition, step
+            if (childCount == 3)
+            {
+                step = (IASTExprNode)childs.Dequeue();
+            }
+            cond = (IASTExprNode)childs.Dequeue();
+            counter = childs.Dequeue();
+
+            ASTForStatementNode forNode = (ASTForStatementNode)_nodes.Peek();
+
+            forNode.Counter = counter;
+            forNode.Condition = cond;
+            forNode.Step = step;
+            forNode.Body = body;
         }
     }
 }

@@ -16,7 +16,7 @@ subStatement
 	;
 
 bodyStatement
-	:	((assignStatement | whileStatement | subCallStatement | returnStatement) NEWLINE+)+
+	:	((assignStatement | whileStatement | | forStatement | subCallStatement | returnStatement) NEWLINE+)+
 	;
 
 assignStatement
@@ -29,6 +29,21 @@ returnStatement
 
 whileStatement
 	:	WHILE LR_BRACKET expr RR_BRACKET NEWLINE+
+			(bodyStatement)?
+		END_CYC
+	;
+
+counterDecl
+	:	var
+	|	assignStatement
+	;
+
+stepDecl
+	:	COMMA expr
+	;
+
+forStatement
+	:	FOR LR_BRACKET counterDecl COMMA expr stepDecl? RR_BRACKET NEWLINE+
 			(bodyStatement)?
 		END_CYC
 	;
@@ -85,6 +100,8 @@ name
 compOp
 	:	EQUAL
 	|	NOT_EQUAL
+	|	LESS
+	|	GREATER
 	|	LESS_OR_EQUAL
 	|	GREATER_OR_EQUAL
 	;

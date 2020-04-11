@@ -17,6 +17,7 @@ namespace CmancNet.ASTParser.AST
         public int EndLine { set;  get; }
         public int StartPos { set;  get; }
         public int EndPos { set;  get; }
+        public string SourcePath { set; get; }
 
         public ASTNode(ASTNode parent)
         {
@@ -38,6 +39,7 @@ namespace CmancNet.ASTParser.AST
                 EndLine = StartLine;
                 EndPos = StartPos;
             }
+            SourcePath = context.Start.InputStream.SourceName;
         }
 
         public new virtual string ToString()

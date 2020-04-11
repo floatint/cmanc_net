@@ -1,1 +1,12 @@
-﻿
+﻿sub(main, $args)
+	test() = 15
+	for ($i = 0, $i < 12, 1)
+		test("1111")
+	end_cyc
+
+	for($i, $i + 12)
+	end_cyc
+
+	for ($i = 0, $i < 12, 12)
+	end_cyc
+end_sub

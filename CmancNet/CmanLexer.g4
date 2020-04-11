@@ -77,6 +77,14 @@ NOT_EQUAL
 	:	'!='
 	;
 
+LESS
+	:	'<'
+	;
+
+GREATER
+	:	'>'
+	;
+
 LESS_OR_EQUAL
 	:	'<='
 	;

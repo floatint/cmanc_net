@@ -23,7 +23,7 @@ namespace CmancNet.ASTParser.AST.Statements
             get => _body;
         }
 
-        public ASTArgListNode Arguments
+        public ASTArgListNode ArgList
         {
             set
             {
@@ -45,7 +45,7 @@ namespace CmancNet.ASTParser.AST.Statements
         {
             get
             {
-                var list = new List<ASTNode> { Arguments, Body };
+                var list = new List<ASTNode> { ArgList, Body };
                 list.RemoveAll(x => x is null);
                 return list;
             }

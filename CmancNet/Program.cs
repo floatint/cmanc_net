@@ -13,16 +13,22 @@ namespace CmancNet
     {
         static void Main(string[] args)
         {
+            Codegen.CodegenVisitor cv = new Codegen.CodegenVisitor();
+            var a = cv.BuildAssembly("test");
+            a.Save("test.exe");
             var source = Utils.SourceProvider.FromFile(args[0]);
             ITokenSource tokenSource = new CmanLexer(source);
             ITokenStream tokenStream = new CommonTokenStream(tokenSource);
             CmanParser parser = new CmanParser(tokenStream);
+            //parser.RemoveErrorListeners();
+            //parser.AddErrorListener(new Utils.ANTLRErrorListener());
             IParseTree parseTree = parser.compileUnit();
             ParseTreeWalker walker = new ParseTreeWalker();
             //ast builder
             var astBuilder = new ASTBuilderListener();
             walker.Walk(astBuilder, parseTree);
             var ast = astBuilder.CompilationUnit;
+            var st = new ASTProcessors.ASTSymbolTableBuilder().BuildSymbolTable(ast);
             //Console.WriteLine(ast.ToString());
             //Console.WriteLine(parseTree.ToStringTree(parser));
             Console.WriteLine(Utils.ASTPrinter.Print(ast));
