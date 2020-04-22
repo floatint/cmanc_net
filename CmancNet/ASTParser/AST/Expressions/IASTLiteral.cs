@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmancNet.ASTParser.AST.Expressions
 {
-    interface IASTCmpOpNode : IASTBinOpNode
+    interface IASTLiteral
     {
     }
 }

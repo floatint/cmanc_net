@@ -15,6 +15,8 @@ namespace CmancNet.ASTInfo
 
         public bool IsVariable() => false;
 
+        public bool IsArgument() => false;
+
         public int ArgumentsCount { private set; get; }
 
         public bool Return { private set; get; }

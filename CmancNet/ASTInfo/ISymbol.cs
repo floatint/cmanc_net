@@ -11,5 +11,6 @@ namespace CmancNet.ASTInfo
         bool IsSubroutine();
         bool IsVariable();
         bool IsNative();
+        bool IsArgument();
     }
 }

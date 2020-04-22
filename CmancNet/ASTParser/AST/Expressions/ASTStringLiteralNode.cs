@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmancNet.ASTParser.AST.Expressions
 {
-    class ASTStringLiteralNode : ASTNode, IASTExprNode
+    class ASTStringLiteralNode : ASTNode, IASTExprNode, IASTLiteral
     {
         public string Value { set; get; }
 

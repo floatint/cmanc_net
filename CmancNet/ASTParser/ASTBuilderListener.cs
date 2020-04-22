@@ -32,6 +32,7 @@ namespace CmancNet.ASTParser
         public ASTBuilderListener()
         {
             _nodes = new Stack<ASTNode>();
+            Errors = new List<string>();
         }
 
         public override void EnterCompileUnit([NotNull] CmanParser.CompileUnitContext context)
@@ -70,6 +71,22 @@ namespace CmancNet.ASTParser
             var compileUnitNode = (ASTCompileUnitNode)_nodes.Peek();
             compileUnitNode.AddProcedure(procNode);
         }
+
+        public override void EnterReturnStatement([NotNull] CmanParser.ReturnStatementContext context)
+        {
+            _nodes.Push(new ASTReturnStatementNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitReturnStatement([NotNull] CmanParser.ReturnStatementContext context)
+        {
+            if (_nodes.Peek() is IASTExprNode)
+            {
+                IASTExprNode expr = (IASTExprNode)_nodes.Pop();
+                ((ASTReturnStatementNode)_nodes.Peek()).Expression = expr;
+            }
+        }
+
+
 
         public override void EnterArgListDecl([NotNull] CmanParser.ArgListDeclContext context)
         {

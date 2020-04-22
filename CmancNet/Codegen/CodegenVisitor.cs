@@ -20,6 +20,11 @@ namespace CmancNet.Codegen
             object a = "kesk";
         }
 
+        void IL3(String[] args)
+        {
+            args = null;
+        }
+
         public AssemblyBuilder BuildAssembly(string name)
         {
             System.Reflection.AssemblyName assemblyName = new System.Reflection.AssemblyName(name);
@@ -37,8 +42,10 @@ namespace CmancNet.Codegen
                 | System.Reflection.MethodAttributes.Static
                 | System.Reflection.MethodAttributes.HideBySig
                 );
+            
             metB.SetParameters(typeof(string[]));
             ILGenerator il = metB.GetILGenerator();
+            LocalBuilder lb = il.DeclareLocal(typeof(object));
             il.DeclareLocal(typeof(Object));
             il.Emit(OpCodes.Nop);
             il.Emit(OpCodes.Ldc_I4_S, 100);

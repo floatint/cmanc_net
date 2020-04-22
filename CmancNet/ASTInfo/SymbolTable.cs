@@ -45,5 +45,7 @@ namespace CmancNet.ASTInfo
         {
             _symbols.Add(name, symbol);
         }
+
+        public int SymbolsCount() => _symbols.Count();
     }
 }

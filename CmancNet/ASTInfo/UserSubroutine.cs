@@ -17,7 +17,7 @@ namespace CmancNet.ASTInfo
             }
         }
 
-        public bool Return { private set; get;}
+        public bool Return { set; get;}
 
         public bool IsNative()
         {
@@ -34,13 +34,30 @@ namespace CmancNet.ASTInfo
             return false;
         }
 
+        public bool IsArgument() => false;
+
         public ASTSubStatementNode Node { private set; get; }
-        public IList<ISymbol> LocalVariables { private set; get; }
+        
 
         public UserSubroutine(ASTSubStatementNode node)
         {
             Node = node;
-            
+            _locals = new Dictionary<string, ISymbol>();
         }
+
+        public ISymbol FindLocal(string name)
+        {
+            _locals.TryGetValue(name, out ISymbol sym);
+            return sym;
+        }
+
+        public void AddLocal(string name, ISymbol local)
+        {
+            if (_locals.ContainsKey(name))
+                return;
+            _locals.Add(name, local);
+        }
+
+        private Dictionary<string, ISymbol> _locals;
     }
 }

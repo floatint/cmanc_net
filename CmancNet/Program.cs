@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Antlr4.Runtime.Tree;
 using Antlr4.Runtime;
 using CmancNet.ASTParser;
+using CmancNet.ASTProcessors;
 
 namespace CmancNet
 {
@@ -13,9 +14,9 @@ namespace CmancNet
     {
         static void Main(string[] args)
         {
-            Codegen.CodegenVisitor cv = new Codegen.CodegenVisitor();
-            var a = cv.BuildAssembly("test");
-            a.Save("test.exe");
+            //Codegen.CodegenVisitor cv = new Codegen.CodegenVisitor();
+            //var a = cv.BuildAssembly("test");
+            //a.Save("test.exe");
             var source = Utils.SourceProvider.FromFile(args[0]);
             ITokenSource tokenSource = new CmanLexer(source);
             ITokenStream tokenStream = new CommonTokenStream(tokenSource);
@@ -28,7 +29,22 @@ namespace CmancNet
             var astBuilder = new ASTBuilderListener();
             walker.Walk(astBuilder, parseTree);
             var ast = astBuilder.CompilationUnit;
-            var st = new ASTProcessors.ASTSymbolTableBuilder().BuildSymbolTable(ast);
+            if (astBuilder.ErrorsCount != 0)
+            {
+                foreach (var e in astBuilder.Errors)
+                {
+                    Console.WriteLine(e);
+                }
+                return;
+            }
+            var symbolTable = new ASTProcessors.ASTSymbolTableBuilder().Build(ast);
+            ASTSemanticChecker semanticChecker = new ASTSemanticChecker(ast, symbolTable);
+            if (!semanticChecker.IsValid())
+            {
+                foreach (var e in semanticChecker.Errors)
+                    Console.WriteLine(e);
+                return;
+            }
             //Console.WriteLine(ast.ToString());
             //Console.WriteLine(parseTree.ToStringTree(parser));
             Console.WriteLine(Utils.ASTPrinter.Print(ast));

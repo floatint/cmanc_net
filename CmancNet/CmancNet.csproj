@@ -88,12 +88,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ASTInfo\Argument.cs" />
     <Compile Include="ASTInfo\ISubroutine.cs" />
     <Compile Include="ASTInfo\ISymbol.cs" />
     <Compile Include="ASTInfo\NativeSubroutine.cs" />
     <Compile Include="ASTInfo\SymbolTable.cs" />
     <Compile Include="ASTInfo\SystemEnvironment.cs" />
     <Compile Include="ASTInfo\UserSubroutine.cs" />
+    <Compile Include="ASTInfo\Variable.cs" />
     <Compile Include="ASTParser\AST\ASTArgListNode.cs" />
     <Compile Include="ASTParser\AST\ASTExprListNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTAbstractBinOpNode.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="ASTParser\AST\Expressions\ASTStringLiteralNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTVariableNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTAddOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTEqualOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTGreaterCmpOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessCmpOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTSubOpNode.cs" />
@@ -111,11 +114,13 @@
     <Compile Include="ASTParser\AST\Expressions\Unary\ASTIndexOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Unary\ASTMinusOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Unary\ASTNotOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTLiteral.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTAssignStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTBodyStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTForStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTReturnStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTSubStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTWhileStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\IASTStatementNode.cs" />

@@ -49,12 +49,12 @@ end_sub
     - [x] Compilation unit
     - [x] Procedure statement
         - [x] Arguments list
-        - [ ] Return statement
+        - [x] Return statement
     - [x] Body statement
     - [ ] Loops
         - [ ] Break statement
         - [x] While loop
-        - [ ] For loop
+        - [x] For loop
 	- [ ] Flow control
 		- [ ] If statement
 		- [ ] Else statement
@@ -66,11 +66,16 @@ end_sub
 		- [x] Substraction
 		- [ ] Multiply
 		- [ ] Division
+		- [x] Less
+		- [x] Greater
+		- [x] Equal
 	- [x] Unary operators
 		- [x] Not
 		- [x] Minus
 		- [x] Indexing
  - AST Processors
+	- [x] Symbol table builder
+	- [x] Semantic checker
  - Codegen
  - Assemblies builder
 

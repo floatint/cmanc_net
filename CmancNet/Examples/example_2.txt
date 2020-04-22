@@ -1,5 +1,8 @@
 ﻿sub(main, $args)
-	test() = 15
+	
+	$a = 14
+	$c[14] = 2
+	
 	for ($i = 0, $i < 12, 1)
 		test("1111")
 	end_cyc
@@ -9,4 +12,10 @@
 
 	for ($i = 0, $i < 12, 12)
 	end_cyc
+end_sub
+
+sub(test)
+	$rest = test($keks)
+	8+2[0] = 2
+	$rest = 100
 end_sub
