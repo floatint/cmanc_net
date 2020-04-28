@@ -66,7 +66,8 @@ namespace CmancNet.ASTParser
             {
                 procNode = (ASTSubStatementNode)_nodes.Pop();
             }
-            procNode.Body = bodyNode;
+            if (bodyNode != null)
+                procNode.Body = bodyNode;
 
             var compileUnitNode = (ASTCompileUnitNode)_nodes.Peek();
             compileUnitNode.AddProcedure(procNode);
@@ -197,24 +198,24 @@ namespace CmancNet.ASTParser
         //Push unar operation to stack
         public override void EnterUnarOp([NotNull] CmanParser.UnarOpContext context)
         {
-            var child = context.GetChild(0);
-            if (child.GetText() == "-")
-                _nodes.Push(new ASTMinusOpNode((CmanParser.UnarOpContext)child, _nodes.Peek()));
-            if (child.GetText() == "!")
-                _nodes.Push(new ASTNotOpNode((CmanParser.UnarOpContext)child, _nodes.Peek()));
+            var op = context.GetChild(0);
+            if (op.GetText() == "-")
+                _nodes.Push(new ASTMinusOpNode(context, _nodes.Peek()));
+            if (op.GetText() == "!")
+                _nodes.Push(new ASTNotOpNode(context, _nodes.Peek()));
         }
 
-        //Pop operand of unar operation
-        public override void ExitUnarOp([NotNull] CmanParser.UnarOpContext context)
-        {
-            var expr = (IASTExprNode)_nodes.Pop();
-            var opNode = (IASTUnarOpNode)_nodes.Peek();
-            opNode.Expression = expr;
-            /*if (opNode is ASTMinusOpNode minusNode)
-                minusNode.Expression = expr;
-            if (opNode is ASTUnarNotOpNode notNode)
-                notNode.Expression = expr;*/
-        }
+        ////Pop operand of unar operation
+        //public override void ExitUnarOp([NotNull] CmanParser.UnarOpContext context)
+        //{
+        //    var expr = (IASTExprNode)_nodes.Pop();
+        //    var opNode = (IASTUnarOpNode)_nodes.Peek();
+        //    opNode.Expression = expr;
+        //    /*if (opNode is ASTMinusOpNode minusNode)
+        //        minusNode.Expression = expr;
+        //    if (opNode is ASTUnarNotOpNode notNode)
+        //        notNode.Expression = expr;*/
+        //}
 
         //Push index op to stack
         public override void EnterIndexOp([NotNull] CmanParser.IndexOpContext context)
@@ -249,11 +250,12 @@ namespace CmancNet.ASTParser
                 _nodes.Push(new ASTLessCmpOpNode(context, _nodes.Peek()));
             if (context.GetText() == ">")
                 _nodes.Push(new ASTGreaterCmpOpNode(context, _nodes.Peek()));
+            if (context.GetText() == "==")
+                _nodes.Push(new ASTEqualOpNode(context, _nodes.Peek()));
 
         }
 
         //Bin operators handling
-        //TODO: rework for IASTBinOpNode
         public override void ExitExpr([NotNull] CmanParser.ExprContext context)
         {
             var t = context.GetText();
@@ -270,6 +272,10 @@ namespace CmancNet.ASTParser
                     binOpNode.Right = right;
                     _nodes.Push(op);
                 }
+            }
+            if (op is IASTUnarOpNode unarOpNode)
+            {
+                unarOpNode.Expression = (IASTExprNode)_nodes.Pop();
             }
             /*if (op is ASTAddOpNode addNode)
             {

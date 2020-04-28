@@ -58,6 +58,8 @@ namespace CmancNet.ASTInfo
             _locals.Add(name, local);
         }
 
+        public Dictionary<string, ISymbol> GetLocalsList() => _locals;
+
         private Dictionary<string, ISymbol> _locals;
     }
 }

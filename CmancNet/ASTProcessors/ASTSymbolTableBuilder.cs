@@ -7,34 +7,54 @@ using CmancNet.ASTParser.AST.Statements;
 using CmancNet.ASTParser.AST.Expressions;
 using CmancNet.ASTParser.AST.Expressions.Unary;
 using CmancNet.ASTInfo;
+using CmancNet.Utils.Logging;
 
 namespace CmancNet.ASTProcessors
 {
+
     class ASTSymbolTableBuilder
     {
+        public IList<MessageRecord> Messages { private set; get; }
+        public int ErrorsCount => Messages.Where(x => x.Message.Type == MsgType.Error).Count();
+        public SymbolTable Symbols { private set; get; }
+
+        public ASTSymbolTableBuilder(ASTCompileUnitNode compileUnit)
+        {
+            _compileUnit = compileUnit;
+            Messages = new List<MessageRecord>();
+        }
         /// <summary>
         /// Top level symbol table building method
         /// </summary>
-        /// <param name="compileUnit">Compile unit AST node</param>
-        /// <returns>Symbol table of subroutines</returns>
-        public SymbolTable Build(ASTCompileUnitNode compileUnit)
+        /// <returns>Symbol table build status</returns>
+        public bool Build()
         {
-            SymbolTable st = new SymbolTable();
-            st.ConnectNativeTable(new SystemEnvironment());
-            if (compileUnit.Procedures != null)
+            Symbols = new SymbolTable();
+            //connect native subs
+            Symbols.ConnectNativeTable(new SystemEnvironment());
+            if (_compileUnit.Procedures != null)
             {
-                foreach (var s in compileUnit.Procedures)
+                foreach (var s in _compileUnit.Procedures)
                 {
-                    var tmp = VisitSub(s);
+                    var tmp = VisitSubStatement(s);
                     if (tmp.Key != null)
-                        st.AddSymbol(tmp.Key, tmp.Value);
+                        Symbols.AddSymbol(tmp.Key, tmp.Value);
                 }
             }
-            return st;
+            return ErrorsCount == 0;
         }
 
-        private KeyValuePair<string, ISymbol> VisitSub(ASTSubStatementNode subNode)
+        private KeyValuePair<string, ISymbol> VisitSubStatement(ASTSubStatementNode subNode)
         {
+            var existsSub = (ISubroutine)Symbols.FindSymbol(subNode.Name);
+            if (existsSub != null)
+            {
+                if (existsSub is NativeSubroutine)
+                    Messages.Add(new MessageRecord(MsgCode.NativeSubOverride, subNode.SourcePath, subNode.StartLine, subNode.StartPos, subNode.Name));
+                else
+                    Messages.Add(new MessageRecord(MsgCode.UserSubOverride, subNode.SourcePath, subNode.StartLine, subNode.StartPos, subNode.Name));
+                return new KeyValuePair<string, ISymbol>();
+            }
             UserSubroutine sub = new UserSubroutine(subNode);
             if (subNode.ArgList != null)
             {
@@ -74,10 +94,6 @@ namespace CmancNet.ASTProcessors
             return new KeyValuePair<string, ISymbol>();
         }
 
-        private KeyValuePair<string, ISymbol> VisitVariable(ASTVariableNode varNode)
-        {
-            return new KeyValuePair<string, ISymbol>(varNode.Name, new Variable());
-        }
 
         private KeyValuePair<string, ISymbol> VisitForStatement(ASTForStatementNode forStmt)
         {
@@ -87,5 +103,7 @@ namespace CmancNet.ASTProcessors
                 return VisitAssignStatement(assignStmt);
             return new KeyValuePair<string, ISymbol>();
         }
+
+        private ASTCompileUnitNode _compileUnit;
     }
 }

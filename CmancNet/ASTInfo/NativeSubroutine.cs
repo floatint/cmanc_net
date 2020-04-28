@@ -22,11 +22,14 @@ namespace CmancNet.ASTInfo
         public bool Return { private set; get; }
 
         public MethodInfo NativeMethod { private set; get; }
+        public Type ReturnType { private set; get; }
 
-        public NativeSubroutine(MethodInfo method, int argsCnt)
+        public NativeSubroutine(MethodInfo method, int argsCnt, Type retType)
         {
             NativeMethod = method;
             ArgumentsCount = argsCnt;
+            Return = retType != null;
+            ReturnType = retType;
         }
     }
 }

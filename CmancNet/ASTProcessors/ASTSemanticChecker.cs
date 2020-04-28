@@ -7,8 +7,8 @@ using CmancNet.ASTParser.AST;
 using CmancNet.ASTParser.AST.Statements;
 using CmancNet.ASTParser.AST.Expressions;
 using CmancNet.ASTParser.AST.Expressions.Unary;
+using CmancNet.Utils.Logging;
 using CmancNet.ASTInfo;
-using CmancNet.Utils;
 
 namespace CmancNet.ASTProcessors
 {
@@ -18,9 +18,12 @@ namespace CmancNet.ASTProcessors
         {
             _compileUnit = compileUnit;
             _symbolTable = symbolTable;
-            _errors = new List<string>();
+            //Errors = new List<string>();
+            //Warnings = new List<string>();
+            Messages = new List<MessageRecord>();
         }
-        public IList<string> Errors => _errors;
+
+        public IList<MessageRecord> Messages { private set; get; }
 
         public bool IsValid()
         {
@@ -28,19 +31,33 @@ namespace CmancNet.ASTProcessors
             {
                 CheckSubroutine(s);
             }
-            return !_error;
+            return Messages.Where(x => x.Message.Type == MsgType.Error).Count() == 0 ? true : false;
         }
+
 
         private void CheckSubroutine(ASTSubStatementNode subNode)
         {
             _currentSub = (UserSubroutine)_symbolTable.FindSymbol(subNode.Name);
             if (subNode.Body != null)
             {
-                foreach (var s in subNode.Body.Statements)
-                {
-                    CheckStatement(s);
-                }
+                CheckBody(subNode.Body);
+            } else
+            {
+                //Messages.Add(PackMessage(MsgCode.EmptyBody, subNode, null));
+                Messages.Add(new MessageRecord(
+                    MsgCode.EmptyBody,
+                    subNode.SourcePath,
+                    subNode.StartLine,
+                    subNode.StartPos,
+                    null
+                    ));
             }
+        }
+
+        private void CheckBody(ASTBodyStatementNode bodyNode)
+        {
+            foreach (var s in bodyNode.Statements)
+                CheckStatement(s);
         }
 
         private void CheckStatement(IASTStatementNode stmtNode)
@@ -51,11 +68,26 @@ namespace CmancNet.ASTProcessors
                 CheckSubCall(callNode, false);
             if (stmtNode is ASTWhileStatementNode whileNode)
                 CheckWhileStatement(whileNode);
+            if (stmtNode is ASTForStatementNode forNode)
+                CheckForStatement(forNode);
         }
 
         private void CheckAssignStatement(ASTAssignStatementNode assignNode)
-        {
-            CheckExpression(assignNode.Left);
+        {   
+            if (IsRvalue(assignNode.Left))
+            {
+                Messages.Add(new MessageRecord(
+                    MsgCode.RvalueAssign,
+                    assignNode.SourcePath,
+                    assignNode.StartLine,
+                    assignNode.StartPos,
+                    null
+                    ));
+                //Messages.Add(PackMessage(MsgCode.RvalueAssign, assignNode, null));
+                //Errors.Add(MessageFormatter.Format((ASTNode)assignNode.Left, MsgCode.RvalueAssign, null));
+            }
+            else
+                CheckExpression(assignNode.Left);
             CheckExpression(assignNode.Right);
         }
 
@@ -77,9 +109,15 @@ namespace CmancNet.ASTProcessors
             ISymbol definedVar = _currentSub.FindLocal(varNode.Name);
             if (definedVar == null)
             {
-                string msg = "\'${0}\' undefined variable";
-                _errors.Add(ErrorFormatter.Format(varNode, string.Format(msg, varNode.Name)));
-                _error = true;
+                Messages.Add(new MessageRecord(
+                    MsgCode.UndefinedVariable,
+                    varNode.SourcePath,
+                    varNode.StartLine,
+                    varNode.StartPos,
+                    varNode.Name
+                    ));
+                //Messages.Add(PackMessage(MsgCode.UndefinedVariable, varNode, varNode.Name));
+                //Errors.Add(MessageFormatter.Format(varNode, MsgCode.UndefinedVariable, varNode.Name));
             }
         }
 
@@ -105,9 +143,15 @@ namespace CmancNet.ASTProcessors
                 !(indexOpNode.Expression is ASTCallStatementNode)
                 )
             {
-                string msg = "index statement requires lvalue, but rvalue found";
-                _errors.Add(ErrorFormatter.Format(indexOpNode, string.Format(msg)));
-                _error = true;
+                Messages.Add(new MessageRecord(
+                    MsgCode.RvalueIndexing,
+                    indexOpNode.SourcePath,
+                    indexOpNode.StartLine,
+                    indexOpNode.StartPos,
+                    null
+                    ));
+                //Messages.Add(PackMessage(MsgCode.RvalueIndexing, indexOpNode, null));
+                //Errors.Add(MessageFormatter.Format(indexOpNode, MsgCode.RvalueIndexing, null));
             }
             else
             {
@@ -132,9 +176,15 @@ namespace CmancNet.ASTProcessors
             ISubroutine sub = (ISubroutine)_symbolTable.FindSymbol(callNode.ProcedureName);
             if (sub == null)
             {
-                string msg = "\'{0}\' subroutine not defined";
-                _errors.Add(ErrorFormatter.Format(callNode, string.Format(msg, callNode.ProcedureName)));
-                _error = true;
+                Messages.Add(new MessageRecord(
+                    MsgCode.UndefinedSub,
+                    callNode.SourcePath,
+                    callNode.StartLine,
+                    callNode.StartPos,
+                    callNode.ProcedureName
+                    ));
+                //Messages.Add(PackMessage(MsgCode.UndefinedSub, callNode, callNode.ProcedureName));
+                //Errors.Add(MessageFormatter.Format(callNode, MsgCode.UndefinedSub, callNode.ProcedureName));
             }
             else
             {
@@ -143,9 +193,15 @@ namespace CmancNet.ASTProcessors
                 {
                     if (!sub.Return)
                     {
-                        string msg = "statement requires a return value, but the \'{0}\' returns void";
-                        _errors.Add(ErrorFormatter.Format(callNode, string.Format(msg, callNode.ProcedureName)));
-                        _error = true;
+                        Messages.Add(new MessageRecord(
+                            MsgCode.ReturnNotFound,
+                            callNode.SourcePath,
+                            callNode.StartLine,
+                            callNode.StartPos,
+                            callNode.ProcedureName
+                            ));
+                        //Messages.Add(PackMessage(MsgCode.ReturnNotFound, callNode, callNode.ProcedureName));
+                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.ReturnNotFound, callNode.ProcedureName));
                     }
                 }
 
@@ -155,15 +211,30 @@ namespace CmancNet.ASTProcessors
                 {
                     if (argCnt > callNode.Arguments.Children.Count)
                     {
-                        string msg = "too few arguments, {0} required, but {1} found";
-                        _errors.Add(ErrorFormatter.Format(callNode, string.Format(msg, argCnt, callNode.Arguments.Children.Count)));
-                        _error = true;
+                        Messages.Add(new MessageRecord(
+                            MsgCode.TooFewArguments,
+                            callNode.SourcePath,
+                            callNode.StartLine,
+                            callNode.StartPos,
+                            argCnt,
+                            callNode.Arguments.Children.Count
+                            ));
+                        //Messages.Add(PackMessage(MsgCode.TooFewArguments, callNode, argCnt, callNode.Arguments.Children.Count));
+                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.TooFewArguments, argCnt, callNode.Arguments.Children.Count));
                     }
                     if (argCnt < callNode.Arguments.Children.Count)
                     {
-                        string msg = "too many arguments, {0} required, but {1} found";
-                        _errors.Add(ErrorFormatter.Format(callNode, string.Format(msg, argCnt, callNode.Arguments.Children.Count)));
-                        _error = true;
+                        Messages.Add(new MessageRecord(
+                            MsgCode.TooManyArguments,
+                            callNode.SourcePath,
+                            callNode.StartLine,
+                            callNode.StartPos,
+                            argCnt,
+                            callNode.Arguments.Children.Count
+                            ));
+                        //Messages.Add(PackMessage(MsgCode.TooManyArguments, callNode, argCnt, callNode.Arguments.Children.Count));
+                        //string msg = "too many arguments, {0} required, but {1} found";
+                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.TooManyArguments, argCnt, callNode.Arguments.Children.Count));
                     }
                     //check arguments
                     foreach(var a in callNode.Arguments.Expressions)
@@ -175,9 +246,17 @@ namespace CmancNet.ASTProcessors
                 {
                     if (argCnt != 0)
                     {
-                        string msg = "too few arguments, {0} required, but {1} found";
-                        _errors.Add(ErrorFormatter.Format(callNode, string.Format(msg, argCnt, 0)));
-                        _error = true;
+                        Messages.Add(new MessageRecord(
+                           MsgCode.TooFewArguments,
+                           callNode.SourcePath,
+                           callNode.StartLine,
+                           callNode.StartPos,
+                           argCnt,
+                           0
+                           ));
+                        //Messages.Add(PackMessage(MsgCode.TooFewArguments, callNode, argCnt, 0));
+                        //string msg = "too few arguments, {0} required, but {1} found";
+                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.TooFewArguments, argCnt, 0));
                     }
                 }
             }
@@ -185,13 +264,76 @@ namespace CmancNet.ASTProcessors
 
         private void CheckWhileStatement(ASTWhileStatementNode whileNode)
         {
+            if (whileNode.Body != null)
+            {
+                CheckBody(whileNode.Body);
+            }
+        }
+
+        private void CheckForStatement(ASTForStatementNode forNode)
+        {
+            //check counter
+            if (forNode.Counter is ASTVariableNode varNode)
+                CheckVariable(varNode);
+            if (forNode.Counter is ASTAssignStatementNode assignNode)
+                CheckAssignStatement(assignNode);
+            //check condition
+            /*if (!(forNode.Condition is IASTCmpOpNode) && !(forNode.Condition is ASTNotOpNode))
+            {
+                string msg = "for condition statement requires only boolean operations";
+                _errors.Add(ErrorFormatter.Format((ASTNode)forNode.Condition, string.Format(msg)));
+                _error = true;
+            }
+            else
+            {
+                CheckExpression(forNode.Condition);
+            }*/
+            CheckExpression(forNode.Condition);
+            //check step if his defined
+            if (forNode.Step != null)
+            {
+                CheckExpression(forNode.Step);
+            }
+
+            //checkbody
+            if (forNode.Body != null)
+                CheckBody(forNode.Body);
 
         }
 
 
 
-        private IList<string> _errors;
-        private bool _error;
+        //Some helpers
+
+        /// <summary>
+        /// Check expression for rvalue or lvalue
+        /// </summary>
+        /// <param name="expr">Expression for check</param>
+        /// <returns>Expression is rvalue or not</returns>
+        private bool IsRvalue(IASTExprNode expr)
+        {
+            if (expr is ASTVariableNode)
+                return false;
+            if (expr is ASTIndexOpNode)
+                return false;
+            if (expr is ASTCallStatementNode)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// Pack message into tuple for top level viewers (json, console, etc)
+        /// </summary>
+        /// <param name="code">Message code</param>
+        /// <param name="node">AST node for message location</param>
+        /// <param name="args">Message arguments</param>
+        /// <returns>Packed tuple message</returns>
+        private Tuple<MsgCode, Message, ASTNode, object[]> PackMessage(MsgCode code, ASTNode node, params object[] args)
+        {
+            return new Tuple<MsgCode, Message, ASTNode, object[]>(code, MessageTable.Get()[code], node, args);
+        }
+
+
         private ASTCompileUnitNode _compileUnit;
         private SymbolTable _symbolTable;
         private UserSubroutine _currentSub;

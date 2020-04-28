@@ -41,11 +41,12 @@ namespace CmancNet.ASTInfo
             }
         }
 
-        public virtual void AddSymbol(string name, ISymbol symbol)
+        public virtual bool AddSymbol(string name, ISymbol symbol)
         {
+            if (_symbols.ContainsKey(name))
+                return false;
             _symbols.Add(name, symbol);
+            return true;
         }
-
-        public int SymbolsCount() => _symbols.Count();
     }
 }

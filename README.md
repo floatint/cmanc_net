@@ -76,6 +76,11 @@ end_sub
  - AST Processors
 	- [x] Symbol table builder
 	- [x] Semantic checker
+		- [x] Undefined variables
+		- [x] Undefined subroutines
+		- [x] Subroutine call arguments count check
+		- [x] Subroutine call return check
+		- [x] Assignment to rvalue check
  - Codegen
  - Assemblies builder
 
