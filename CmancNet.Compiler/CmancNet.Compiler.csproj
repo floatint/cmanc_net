@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props" Condition="Exists('..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6029258E-4D92-4D96-A8C5-B512C322CC5F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>CmancNet.Compiler</RootNamespace>
+    <AssemblyName>CmancNet.Compiler</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr4.Runtime, Version=4.6.0.0, Culture=neutral, PublicKeyToken=09abb75b9ed49849, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr4.Runtime.4.6.6\lib\net45\Antlr4.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ASTInfo\Argument.cs" />
+    <Compile Include="ASTInfo\ISubroutine.cs" />
+    <Compile Include="ASTInfo\ISymbol.cs" />
+    <Compile Include="ASTInfo\NativeSubroutine.cs" />
+    <Compile Include="ASTInfo\SymbolTable.cs" />
+    <Compile Include="ASTInfo\SystemEnvironment.cs" />
+    <Compile Include="ASTInfo\UserSubroutine.cs" />
+    <Compile Include="ASTInfo\Variable.cs" />
+    <Compile Include="ASTParser\AST\ASTArgListNode.cs" />
+    <Compile Include="ASTParser\AST\ASTExprListNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTAbstractBinOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTNumberLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTStringLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTVariableNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTAddOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTEqualOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTGreaterCmpOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessCmpOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTSubOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTBinOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTCmpOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTExprNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTUnarOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Unary\ASTIndexOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Unary\ASTMinusOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Unary\ASTNotOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTLiteral.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTAssignStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTBodyStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTForStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTReturnStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTSubStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTWhileStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\IASTStatementNode.cs" />
+    <Compile Include="ASTProcessors\ASTSemanticChecker.cs" />
+    <Compile Include="ASTProcessors\ASTSymbolTableBuilder.cs" />
+    <Compile Include="CmancCompiler.cs" />
+    <Compile Include="CmanLexer.g4.cs">
+      <DependentUpon>CmanLexer.g4</DependentUpon>
+    </Compile>
+    <Compile Include="CmanParser.g4.cs">
+      <DependentUpon>CmanParser.g4</DependentUpon>
+    </Compile>
+    <Compile Include="ASTParser\ASTBuilderListener.cs" />
+    <Compile Include="ASTParser\AST\ASTNode.cs" />
+    <Compile Include="Codegen\AssemblyHolder.cs" />
+    <Compile Include="Codegen\CodeBuilder.cs" />
+    <Compile Include="Codegen\CodeEmiter.cs" />
+    <Compile Include="Codegen\MethodContext.cs" />
+    <Compile Include="ICompiler.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ANTLRErrorListener.cs" />
+    <Compile Include="Utils\Logging\Message.cs" />
+    <Compile Include="Utils\Logging\MessageFormatter.cs" />
+    <Compile Include="Utils\Logging\MessageRecord.cs" />
+    <Compile Include="Utils\Logging\MessageTable.cs" />
+    <Compile Include="Utils\Logging\MsgCodeEnum.cs" />
+    <Compile Include="Utils\Logging\MsgTypeEnum.cs" />
+    <Compile Include="Utils\SourceProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <Antlr4 Include="CmanLexer.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>CmancNet.Compiler</CustomToolNamespace>
+    </Antlr4>
+    <Antlr4 Include="CmanParser.g4">
+      <Generator>MSBuild:Compile</Generator>
+      <CustomToolNamespace>CmancNet.Compiler</CustomToolNamespace>
+    </Antlr4>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.props'))" />
+    <Error Condition="!Exists('..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets'))" />
+  </Target>
+  <Import Project="..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets" Condition="Exists('..\packages\Antlr4.CodeGenerator.4.6.6\build\Antlr4.CodeGenerator.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
