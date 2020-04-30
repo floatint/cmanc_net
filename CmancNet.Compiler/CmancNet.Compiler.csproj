@@ -125,6 +125,7 @@
     <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTForStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTIfStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTReturnStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTSubStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTWhileStatementNode.cs" />

@@ -47,26 +47,33 @@ namespace CmancNet.Compiler.Codegen
             _emitter = new CodeEmiter(_context.ILGenerator);
             if (subNode.Body != null)
             {
-                foreach (var s in subNode.Body.Statements)
-                {
-                    BuildStatement(s);
-                }
+                BuildStatement(subNode.Body);
             }
             else
             {
                 _emitter.Nop();
             }
+            _emitter.MarkLabel(_context.MethodEnd);
             _emitter.Ret();
-            //TODO: epilog emit
             _builtSubs.Add(subNode.Name, _context); //add to built
+        }
+
+        private void BuildBodyStatement(ASTBodyStatementNode bodyNode)
+        {
+            foreach (var s in bodyNode.Statements)
+                BuildStatement(s);
         }
 
         private void BuildStatement(IASTStatementNode stmtNode)
         {
+            if (stmtNode is ASTBodyStatementNode bodyNode)
+                BuildBodyStatement(bodyNode);
             if (stmtNode is ASTAssignStatementNode assignNode)
                 BuildAssignStatement(assignNode);
             if (stmtNode is ASTCallStatementNode callNode)
                 BuildCallStatement(callNode);
+            if (stmtNode is ASTIfStatementNode ifNode)
+                BuildIfStatement(ifNode);
         }
 
         private void BuildAssignStatement(ASTAssignStatementNode assignNode)
@@ -294,6 +301,28 @@ namespace CmancNet.Compiler.Codegen
                 if (userSub.Return)
                     _emitter.StackPush(typeof(object));
             }
+        }
+
+        private void BuildIfStatement(ASTIfStatementNode ifNode)
+        {
+            //define labels
+            var elseBody = _emitter.DefineLabel();
+            var exitIf = _emitter.DefineLabel();
+
+            BuildExpression(ifNode.Condition);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.ToBool();
+            _emitter.JumpFalse(elseBody);
+            if (ifNode.TrueBody != null)
+            {
+                BuildStatement(ifNode.TrueBody);
+                _emitter.Jump(exitIf);
+            }
+            _emitter.MarkLabel(elseBody);
+            if (ifNode.ElseBody != null)
+                BuildStatement(ifNode.ElseBody);
+            _emitter.MarkLabel(exitIf);
+            //_emitter.Nop();
         }
 
         private void BuildVariable(ASTVariableNode varNode)

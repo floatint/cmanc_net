@@ -16,7 +16,7 @@ subStatement
 	;
 
 bodyStatement
-	:	((assignStatement | whileStatement | | forStatement | subCallStatement | returnStatement) NEWLINE+)+
+	:	((assignStatement | whileStatement | ifStatement | forStatement | subCallStatement | returnStatement) NEWLINE+)+
 	;
 
 assignStatement
@@ -24,11 +24,30 @@ assignStatement
 	;
 
 returnStatement
-	:	RETURN expr?
+	:	RETURN varOrExpr?
 	;
+
+ifStatement
+	:	IF LR_BRACKET expr RR_BRACKET NEWLINE+
+			(bodyStatement)?
+			(elseStatement)?
+		END_IF
+	;
+
+elseStatement
+	:	ELSE NEWLINE+
+			(bodyStatement)?
+	;
+
 
 whileStatement
 	:	WHILE LR_BRACKET expr RR_BRACKET NEWLINE+
+			(bodyStatement)?
+		END_CYC
+	;
+
+forStatement
+	:	FOR LR_BRACKET counterDecl COMMA expr stepDecl? RR_BRACKET NEWLINE+
 			(bodyStatement)?
 		END_CYC
 	;
@@ -40,12 +59,6 @@ counterDecl
 
 stepDecl
 	:	COMMA expr
-	;
-
-forStatement
-	:	FOR LR_BRACKET counterDecl COMMA expr stepDecl? RR_BRACKET NEWLINE+
-			(bodyStatement)?
-		END_CYC
 	;
 
 subCallStatement

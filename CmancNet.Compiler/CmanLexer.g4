@@ -28,6 +28,21 @@ END_CYC
 	:	E N D '_' C Y C
 	;
 
+BREAK
+	:	B R E A K
+	;
+
+IF
+	:	I F
+	;
+
+ELSE
+	:	E L S E
+	;
+
+END_IF
+	: E N D '_' I F
+	;
 
 
 

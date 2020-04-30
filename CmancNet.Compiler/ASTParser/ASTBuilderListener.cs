@@ -75,6 +75,7 @@ namespace CmancNet.Compiler.ASTParser
 
         public override void ExitReturnStatement([NotNull] CmanParser.ReturnStatementContext context)
         {
+            //TODO: return node пушить в любом случае. дальше обработает семантический чекер
             if (_nodes.Peek() is IASTExprNode)
             {
                 IASTExprNode expr = (IASTExprNode)_nodes.Pop();
@@ -376,6 +377,44 @@ namespace CmancNet.Compiler.ASTParser
             forNode.Condition = cond;
             forNode.Step = step;
             forNode.Body = body;
+        }
+
+        public override void EnterIfStatement([NotNull] CmanParser.IfStatementContext context)
+        {
+            _nodes.Push(new ASTIfStatementNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitIfStatement([NotNull] CmanParser.IfStatementContext context)
+        {
+            ASTBodyStatementNode elseBody = null;
+            ASTBodyStatementNode trueBody = null;
+            IASTExprNode condition = null;
+            if (_nodes.Peek() is ASTBodyStatementNode)
+            {
+                var tmp = _nodes.Pop();
+                if (_nodes.Peek() is ASTBodyStatementNode)
+                {
+                    elseBody = (ASTBodyStatementNode)tmp;
+                    trueBody = (ASTBodyStatementNode)_nodes.Pop();
+                    condition = (IASTExprNode)_nodes.Pop();
+                }
+                else
+                {
+                    trueBody = (ASTBodyStatementNode)tmp;
+                    condition = (IASTExprNode)_nodes.Pop();
+                }
+            }
+            else
+            {
+                condition = (IASTExprNode)_nodes.Pop();
+                //((ASTIfStatementNode)_nodes.Peek()).Condition = condition;
+            }
+            //TODO: ifnode не привязывает к себе ноды
+            var ifNode = (ASTIfStatementNode)_nodes.Peek();
+            ifNode.Condition = condition;
+            ifNode.TrueBody = trueBody;
+            ifNode.ElseBody = elseBody;
+            return;
         }
     }
 }

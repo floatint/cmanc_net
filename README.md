@@ -55,9 +55,9 @@ end_sub
         - [ ] Break statement
         - [x] While loop
         - [x] For loop
-	- [ ] Flow control
+	- [x] Flow control
 		- [x] If statement
-			- [ ] Else statement
+			- [x] Else statement
     - [x] Assign statement
     - [x] Expressions
     - [x] Procedure call's
@@ -105,9 +105,9 @@ end_sub
 		- [ ] For loop
 		- [ ] While loop
 		- [ ] Break statement
-	- [ ] Flow control
-		- [ ] If statement
-			- [ ] Else statement
+	- [x] Flow control
+		- [x] If statement
+			- [x] Else statement
 
 ## AST parser I/O example
 

@@ -116,7 +116,7 @@ namespace CmancNet.Driver
                     options.SourceFileName,
                     null,
                     null,
-                    timer.ElapsedMilliseconds / 100d
+                    timer.ElapsedMilliseconds / 1000d
                     ));
             }
             else
@@ -132,6 +132,7 @@ namespace CmancNet.Driver
             
             foreach (var m in messages)
                 Console.WriteLine(m);
+            return;
         }
     }
 }

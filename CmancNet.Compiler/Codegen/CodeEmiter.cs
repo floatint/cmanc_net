@@ -90,6 +90,7 @@ namespace CmancNet.Compiler.Codegen
             }
         }
 
+
         public void VirtualCall(Type type, string methodName, Type[] args)
         {
             if (args == null)
@@ -124,20 +125,28 @@ namespace CmancNet.Compiler.Codegen
                 _clrStack.Push(mi.ReturnType);//PushRet(mi.ReturnType);
         }
 
-        //User subroutine call. Without 
+        //User subroutine call. Without cleanup parameters
         public void UnwrapCall(MethodBuilder mb)
         {
             _il.Emit(OpCodes.Call, mb);
         }
 
 
-        /*public void CallVirtual(MethodInfo mi)
+        public void JumpFalse(Label l)
         {
-            _il.Emit(OpCodes.Call, mi);
-            StackPop(mi.GetParameters().Length); //pop 
-            if (mi.ReturnParameter.IsRetval)
-                PushRet(mi.ReturnParameter.GetType());
-        }*/
+            _il.Emit(OpCodes.Brfalse, l);
+        }
+
+        public void JumpTrue(Label l)
+        {
+            _il.Emit(OpCodes.Brtrue, l);
+        }
+
+        public void Jump(Label l)
+        {
+            _il.Emit(OpCodes.Br, l);
+        }
+
 
         public void PushString(string val)
         {
@@ -157,6 +166,15 @@ namespace CmancNet.Compiler.Codegen
             _il.Emit(OpCodes.Ldc_R8, val);
             _clrStack.Push(val.GetType());
         }
+
+        //public void PushBool(bool val)
+        //{
+        //    if (val)
+        //        _il.Emit(OpCodes.Ldc_I4_1);
+        //    else
+        //        _il.Emit(OpCodes.Ldc_I4_0);
+        //    _clrStack.Push(val.GetType());
+        //}
         
         public void ToDecimal()
         {
@@ -164,6 +182,14 @@ namespace CmancNet.Compiler.Codegen
                 throw new InvalidOperationException("CLR stack is empty");
             _il.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDecimal", new Type[] { _clrStack.Pop() }));
             _clrStack.Push(typeof(decimal));
+        }
+
+        public void ToBool()
+        {
+            if (StackEmpty())
+                throw new InvalidOperationException("CLR stack is empty");
+            _il.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToBoolean", new Type[] { _clrStack.Pop() }));
+            _clrStack.Push(typeof(bool));
         }
 
         public void Nop()
@@ -176,7 +202,6 @@ namespace CmancNet.Compiler.Codegen
             _il.Emit(OpCodes.Ret);
         }
 
-        //TODO: продумать
         public void IsEqual()
         {
             _il.Emit(OpCodes.Ceq);
@@ -195,6 +220,9 @@ namespace CmancNet.Compiler.Codegen
             _clrStack.Push(typeof(bool));
         }
 
+        public Label DefineLabel() => _il.DefineLabel();
+
+        public void MarkLabel(Label l) => _il.MarkLabel(l);
 
         public int StackSize() => _clrStack.Count;
 
