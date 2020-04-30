@@ -239,12 +239,20 @@ namespace CmancNet.Compiler.ASTParser
                 _nodes.Push(new ASTAddOpNode(context, _nodes.Peek()));
         }
 
+        public override void EnterMulOrDivOp([NotNull] CmanParser.MulOrDivOpContext context)
+        {
+            if (context.GetText() == "/")
+                _nodes.Push(new ASTDivOpNode(context, _nodes.Peek()));
+            if (context.GetText() == "*")
+                _nodes.Push(new ASTMulOpNode(context, _nodes.Peek()));
+        }
+
         public override void EnterCompOp([NotNull] CmanParser.CompOpContext context)
         {
             if (context.GetText() == "<")
-                _nodes.Push(new ASTLessCmpOpNode(context, _nodes.Peek()));
+                _nodes.Push(new ASTLessOpNode(context, _nodes.Peek()));
             if (context.GetText() == ">")
-                _nodes.Push(new ASTGreaterCmpOpNode(context, _nodes.Peek()));
+                _nodes.Push(new ASTGreaterOpNode(context, _nodes.Peek()));
             if (context.GetText() == "==")
                 _nodes.Push(new ASTEqualOpNode(context, _nodes.Peek()));
 

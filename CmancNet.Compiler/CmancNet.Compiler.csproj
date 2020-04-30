@@ -106,9 +106,11 @@
     <Compile Include="ASTParser\AST\Expressions\ASTStringLiteralNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTVariableNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTAddOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTDivOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTEqualOpNode.cs" />
-    <Compile Include="ASTParser\AST\Expressions\Binary\ASTGreaterCmpOpNode.cs" />
-    <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessCmpOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTGreaterOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTMulOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTSubOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\IASTBinOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\IASTCmpOpNode.cs" />

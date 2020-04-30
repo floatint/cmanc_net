@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace CmancNet.Compiler.ASTParser.AST.Expressions.Binary
 {
-    class ASTGreaterCmpOpNode : ASTAbstractBinOpNode, IASTCmpOpNode
+    class ASTDivOpNode : ASTAbstractBinOpNode
     {
-        public ASTGreaterCmpOpNode(CmanParser.CompOpContext context, ASTNode parent)
+        public ASTDivOpNode(CmanParser.MulOrDivOpContext context, ASTNode parent)
             : base(parent)
         {
             SetLocation(context);

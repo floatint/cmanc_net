@@ -132,12 +132,16 @@ namespace CmancNet.Compiler.Codegen
                 BuildAddOpExpr(addNode);
             if (binOpExpr is ASTSubOpNode subOpNode)
                 BuildSubOpExpr(subOpNode);
+            if (binOpExpr is ASTMulOpNode mulOpNode)
+                BuildMulOpExpr(mulOpNode);
+            if (binOpExpr is ASTDivOpNode divOpNode)
+                BuildDivOpExpr(divOpNode);
             //comparing
             if (binOpExpr is ASTEqualOpNode equalNode)
                 BuildEqualOpExpr(equalNode);
-            if (binOpExpr is ASTGreaterCmpOpNode greaterNode)
+            if (binOpExpr is ASTGreaterOpNode greaterNode)
                 BuildGreaterOpExpr(greaterNode);
-            if (binOpExpr is ASTLessCmpOpNode lessNode)
+            if (binOpExpr is ASTLessOpNode lessNode)
                 BuildLessOpExpr(lessNode);
         }
 
@@ -163,6 +167,28 @@ namespace CmancNet.Compiler.Codegen
             _emitter.Call(typeof(decimal).GetMethod("Subtract", new Type[] { typeof(decimal), typeof(decimal) }));
         }
 
+        private void BuildMulOpExpr(ASTMulOpNode mulNode)
+        {
+            BuildExpression(mulNode.Left);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            BuildExpression(mulNode.Right);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            _emitter.StaticCall(typeof(decimal), "Multiply", new Type[] { typeof(decimal), typeof(decimal)});
+        }
+
+        private void BuildDivOpExpr(ASTDivOpNode divNode)
+        {
+            BuildExpression(divNode.Left);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            BuildExpression(divNode.Right);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            _emitter.StaticCall(typeof(decimal), "Divide", new Type[] { typeof(decimal), typeof(decimal) });
+        }
+
         private void BuildEqualOpExpr(ASTEqualOpNode equalNode)
         {
             BuildExpression(equalNode.Left);
@@ -172,7 +198,7 @@ namespace CmancNet.Compiler.Codegen
             _emitter.VirtualCall(typeof(object), "Equals", new Type[] { typeof(object) });
         }
 
-        private void BuildGreaterOpExpr(ASTGreaterCmpOpNode greaterNode)
+        private void BuildGreaterOpExpr(ASTGreaterOpNode greaterNode)
         {
             BuildExpression(greaterNode.Left);
             if (_emitter.StackPeek() != typeof(decimal))
@@ -185,7 +211,7 @@ namespace CmancNet.Compiler.Codegen
             _emitter.IsGreater();
         }
 
-        private void BuildLessOpExpr(ASTLessCmpOpNode lessNode)
+        private void BuildLessOpExpr(ASTLessOpNode lessNode)
         {
             BuildExpression(lessNode.Left);
             if (_emitter.StackPeek() != typeof(decimal))
