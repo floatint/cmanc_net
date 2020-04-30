@@ -103,7 +103,7 @@ end_sub
 		- [x] Subroutine calls
 	- [ ] Loops
 		- [ ] For loop
-		- [ ] While loop
+		- [x] While loop
 		- [ ] Break statement
 	- [x] Flow control
 		- [x] If statement

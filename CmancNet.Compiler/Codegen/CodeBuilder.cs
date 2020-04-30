@@ -74,6 +74,8 @@ namespace CmancNet.Compiler.Codegen
                 BuildCallStatement(callNode);
             if (stmtNode is ASTIfStatementNode ifNode)
                 BuildIfStatement(ifNode);
+            if (stmtNode is ASTWhileStatementNode whileNode)
+                BuildWhileStatement(whileNode);
         }
 
         private void BuildAssignStatement(ASTAssignStatementNode assignNode)
@@ -323,6 +325,27 @@ namespace CmancNet.Compiler.Codegen
                 BuildStatement(ifNode.ElseBody);
             _emitter.MarkLabel(exitIf);
             //_emitter.Nop();
+        }
+
+        private void BuildWhileStatement(ASTWhileStatementNode whileNode)
+        {
+            var condition = _emitter.DefineLabel();
+            var body = _emitter.DefineLabel();
+            var exitWhile = _emitter.DefineLabel();
+
+            _emitter.MarkLabel(condition);
+            BuildExpression(whileNode.Condition);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.ToBool();
+            _emitter.JumpFalse(exitWhile);
+            //body
+            if (whileNode.Body != null)
+            {
+                BuildStatement(whileNode.Body);
+                _emitter.Jump(condition);
+            }
+            //while exit
+            _emitter.MarkLabel(exitWhile);
         }
 
         private void BuildVariable(ASTVariableNode varNode)
