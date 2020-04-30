@@ -20,18 +20,30 @@ namespace CmancNet.Compiler.ASTProcessors
             _symbolTable = symbolTable;
             //Errors = new List<string>();
             //Warnings = new List<string>();
-            Messages = new List<MessageRecord>();
+            _messages = new List<MessageRecord>();
         }
 
-        public IList<MessageRecord> Messages { private set; get; }
+        public IEnumerable<MessageRecord> Messages => _messages.AsEnumerable();
 
         public bool IsValid()
         {
-            foreach (var s in _compileUnit.Procedures)
+            if (_compileUnit.Procedures != null)
             {
-                CheckSubroutine(s);
+                foreach (var s in _compileUnit.Procedures)
+                {
+                    CheckSubroutine(s);
+                }
             }
-            return Messages.Where(x => x.Message.Type == MsgType.Error).Count() == 0 ? true : false;
+            else
+            {
+                _messages.Add(new MessageRecord(
+                    MsgCode.EmptyCompileUnit,
+                    _compileUnit.SourcePath,
+                    _compileUnit.StartLine,
+                    _compileUnit.StartPos)
+                );
+            }
+            return _messages.Where(x => x.Message.Type == MsgType.Error).Count() == 0 ? true : false;
         }
 
 
@@ -44,7 +56,7 @@ namespace CmancNet.Compiler.ASTProcessors
             } else
             {
                 //Messages.Add(PackMessage(MsgCode.EmptyBody, subNode, null));
-                Messages.Add(new MessageRecord(
+                _messages.Add(new MessageRecord(
                     MsgCode.EmptyBody,
                     subNode.SourcePath,
                     subNode.StartLine,
@@ -76,7 +88,7 @@ namespace CmancNet.Compiler.ASTProcessors
         {   
             if (IsRvalue(assignNode.Left))
             {
-                Messages.Add(new MessageRecord(
+                _messages.Add(new MessageRecord(
                     MsgCode.RvalueAssign,
                     assignNode.SourcePath,
                     assignNode.StartLine,
@@ -109,7 +121,7 @@ namespace CmancNet.Compiler.ASTProcessors
             ISymbol definedVar = _currentSub.FindLocal(varNode.Name);
             if (definedVar == null)
             {
-                Messages.Add(new MessageRecord(
+                _messages.Add(new MessageRecord(
                     MsgCode.UndefinedVariable,
                     varNode.SourcePath,
                     varNode.StartLine,
@@ -143,7 +155,7 @@ namespace CmancNet.Compiler.ASTProcessors
                 !(indexOpNode.Expression is ASTCallStatementNode)
                 )
             {
-                Messages.Add(new MessageRecord(
+                _messages.Add(new MessageRecord(
                     MsgCode.RvalueIndexing,
                     indexOpNode.SourcePath,
                     indexOpNode.StartLine,
@@ -176,7 +188,7 @@ namespace CmancNet.Compiler.ASTProcessors
             ISubroutine sub = (ISubroutine)_symbolTable.FindSymbol(callNode.ProcedureName);
             if (sub == null)
             {
-                Messages.Add(new MessageRecord(
+                _messages.Add(new MessageRecord(
                     MsgCode.UndefinedSub,
                     callNode.SourcePath,
                     callNode.StartLine,
@@ -193,7 +205,7 @@ namespace CmancNet.Compiler.ASTProcessors
                 {
                     if (!sub.Return)
                     {
-                        Messages.Add(new MessageRecord(
+                        _messages.Add(new MessageRecord(
                             MsgCode.ReturnNotFound,
                             callNode.SourcePath,
                             callNode.StartLine,
@@ -211,7 +223,7 @@ namespace CmancNet.Compiler.ASTProcessors
                 {
                     if (argCnt > callNode.Arguments.Children.Count)
                     {
-                        Messages.Add(new MessageRecord(
+                        _messages.Add(new MessageRecord(
                             MsgCode.TooFewArguments,
                             callNode.SourcePath,
                             callNode.StartLine,
@@ -224,7 +236,7 @@ namespace CmancNet.Compiler.ASTProcessors
                     }
                     if (argCnt < callNode.Arguments.Children.Count)
                     {
-                        Messages.Add(new MessageRecord(
+                        _messages.Add(new MessageRecord(
                             MsgCode.TooManyArguments,
                             callNode.SourcePath,
                             callNode.StartLine,
@@ -246,7 +258,7 @@ namespace CmancNet.Compiler.ASTProcessors
                 {
                     if (argCnt != 0)
                     {
-                        Messages.Add(new MessageRecord(
+                        _messages.Add(new MessageRecord(
                            MsgCode.TooFewArguments,
                            callNode.SourcePath,
                            callNode.StartLine,
@@ -337,5 +349,7 @@ namespace CmancNet.Compiler.ASTProcessors
         private ASTCompileUnitNode _compileUnit;
         private SymbolTable _symbolTable;
         private UserSubroutine _currentSub;
+
+        private IList<MessageRecord> _messages;
     }
 }

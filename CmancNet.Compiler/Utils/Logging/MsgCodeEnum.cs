@@ -10,6 +10,7 @@ namespace CmancNet.Compiler.Utils.Logging
     {
         //Errors starts with 1024
         CompilerError = 1024,
+        EntryPointNotFound,
         UndefinedVariable,
         UndefinedSub,
         RvalueIndexing,
@@ -28,5 +29,6 @@ namespace CmancNet.Compiler.Utils.Logging
         //Info starts with 4096
         CompilationSuccessful = 4096,
         CompilationFailed,
+        CompilationTime,
     }
 }

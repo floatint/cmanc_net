@@ -101,32 +101,32 @@ namespace CmancNet.Compiler
                     )});
             } 
             //TODO: add fail compilation msg
-            if (builtAssembly == null)
-            {
-                Messages = Messages.Concat(new MessageRecord[] {
-                    new MessageRecord(
-                        MsgCode.CompilationFailed,
-                        sourcePath,
-                        null,
-                        null,
-                        Messages.Where(x => x.Message.Type == MsgType.Error).Count(),
-                        Messages.Where(x => x.Message.Type == MsgType.Warning).Count()
-                        )
-                });
-            }
-            else
-            {
-                Messages = Messages.Concat(new MessageRecord[] {
-                    new MessageRecord(
-                        MsgCode.CompilationSuccessful,
-                        sourcePath,
-                        null,
-                        null,
-                        Messages.Where(x => x.Message.Type == MsgType.Error).Count(),
-                        Messages.Where(x => x.Message.Type == MsgType.Warning).Count()
-                        )
-                });
-            }
+            //if (builtAssembly == null)
+            //{
+            //    Messages = Messages.Concat(new MessageRecord[] {
+            //        new MessageRecord(
+            //            MsgCode.CompilationFailed,
+            //            sourcePath,
+            //            null,
+            //            null,
+            //            Messages.Where(x => x.Message.Type == MsgType.Error).Count(),
+            //            Messages.Where(x => x.Message.Type == MsgType.Warning).Count()
+            //            )
+            //    });
+            //}
+            //else
+            //{
+            //    Messages = Messages.Concat(new MessageRecord[] {
+            //        new MessageRecord(
+            //            MsgCode.CompilationSuccessful,
+            //            sourcePath,
+            //            null,
+            //            null,
+            //            Messages.Where(x => x.Message.Type == MsgType.Error).Count(),
+            //            Messages.Where(x => x.Message.Type == MsgType.Warning).Count()
+            //            )
+            //    });
+            //}
             return builtAssembly;
         }
 

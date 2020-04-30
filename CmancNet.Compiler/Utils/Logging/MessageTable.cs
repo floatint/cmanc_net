@@ -38,6 +38,7 @@ namespace CmancNet.Compiler.Utils.Logging
             _messages = new Dictionary<MsgCode, Message>();
             //errors
             _messages.Add(MsgCode.CompilerError, new Message(MsgType.Error, "{0}"));
+            _messages.Add(MsgCode.EntryPointNotFound, new Message(MsgType.Error, "entry point with signature '{0}' not found"));
             _messages.Add(MsgCode.UndefinedVariable, new Message(MsgType.Error, "'${0}' undefined variable"));
             _messages.Add(MsgCode.UndefinedSub, new Message(MsgType.Error, "'{0}' undefined subroutine"));
             _messages.Add(MsgCode.RvalueIndexing, new Message(MsgType.Error, "indexing canno't apply for rvalue"));
@@ -56,6 +57,7 @@ namespace CmancNet.Compiler.Utils.Logging
             //infos
             _messages.Add(MsgCode.CompilationSuccessful, new Message(MsgType.Info, "compilation was successfuly with {0} errors, {1} warnings"));
             _messages.Add(MsgCode.CompilationFailed, new Message(MsgType.Info, "compilation failed with {0} errors, {1} warnings"));
+            _messages.Add(MsgCode.CompilationTime, new Message(MsgType.Info, "compilation time: {0:f3} seconds"));
         }
 
         private Dictionary<MsgCode, Message> _messages;
