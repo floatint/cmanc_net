@@ -2,8 +2,10 @@
 .vs
 
 # binaries
-/CmancNet/bin
-/CmancNet/obj
+/CmancNet.Compiler/bin
+/CmancNet.Compiler/obj
+/CmancNet.Driver/bin
+/CmancNet.Driver/obj
 
 
 

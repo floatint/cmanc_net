@@ -1,0 +1,28 @@
+﻿/*sub(a)
+end_sub*/
+/*sub(main, $args)
+	
+	$a = 14
+	//$c[14] = 2
+	
+	for ($i = 0, $i < 12, 1)
+		test()
+	end_cyc
+
+	for($i, $i + 12)
+	end_cyc
+
+	for ($i = 0, $i < 12, 12)
+	end_cyc
+end_sub*/
+
+sub(main)
+	/*$r = array()
+	$r[1+4] = array()
+	$i = 100
+	$r[1+4][$i] = 4.5
+	$c = $r[1+4][$i]
+	println($r[1+4][$i] + 30)*/
+	$a = 100 < 10
+	println(!$a)
+end_sub

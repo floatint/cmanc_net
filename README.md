@@ -49,30 +49,65 @@ end_sub
     - [x] Compilation unit
     - [x] Procedure statement
         - [x] Arguments list
-        - [ ] Return statement
+        - [x] Return statement
     - [x] Body statement
     - [ ] Loops
         - [ ] Break statement
         - [x] While loop
-        - [ ] For loop
+        - [x] For loop
 	- [ ] Flow control
-		- [ ] If statement
-		- [ ] Else statement
+		- [x] If statement
+			- [ ] Else statement
     - [x] Assign statement
     - [x] Expressions
     - [x] Procedure call's
 	- [ ] Binary operators
 		- [x] Additional
 		- [x] Substraction
-		- [ ] Multiply
-		- [ ] Division
+		- [x] Multiply
+		- [x] Division
+		- [x] Less
+		- [x] Greater
+		- [x] Equal
+		- [ ] LessOrEqual
+		- [ ] GreaterOrEqual
+		- [ ] Not equal
 	- [x] Unary operators
 		- [x] Not
 		- [x] Minus
 		- [x] Indexing
  - AST Processors
- - Codegen
- - Assemblies builder
+	- [x] Symbol table builder
+	- [x] Semantic checker
+		- [x] Undefined variables
+		- [x] Undefined subroutines
+		- [x] Subroutine call arguments count check
+		- [x] Subroutine call return check
+		- [x] Assignment to rvalue check
+ - [ ] Codegen
+	- [ ] Subroutines
+		- [ ] Return statement
+	- [x] Expressions
+		- [ ] Binary
+			- [x] Additional
+			- [x] Substraction
+			- [x] Multiply
+			- [x] Division
+			- [x] Equal
+			- [x] Less
+			- [x] Greater
+			- [ ] LessOrEqual
+			- [ ] GreaterOrEqual
+			- [ ] Not equal
+		- [x] Unary
+		- [x] Subroutine calls
+	- [ ] Loops
+		- [ ] For loop
+		- [ ] While loop
+		- [ ] Break statement
+	- [ ] Flow control
+		- [ ] If statement
+			- [ ] Else statement
 
 ## AST parser I/O example
 
