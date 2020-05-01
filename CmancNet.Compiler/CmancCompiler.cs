@@ -40,44 +40,48 @@ namespace CmancNet.Compiler
                 ITokenStream tokenStream = new CommonTokenStream(tokenSource);
                 //get parser
                 CmanParser parser = new CmanParser(tokenStream);
-                // 
 
-                //TODO: add parser error handler
+                var parserErrorListener = new ANTLRErrorListener();
+                parser.RemoveErrorListener(ConsoleErrorListener<IToken>.Instance);
+                parser.AddErrorListener(parserErrorListener);
+                
 
-                //
                 IParseTree parseTree = parser.compileUnit();
-                ParseTreeWalker walker = new ParseTreeWalker();
-                //ast builder
-                var astBuilder = new ASTBuilderListener();
-                //build ast tree
-                walker.Walk(astBuilder, parseTree);
-                var ast = astBuilder.CompilationUnit;
-                //store ast builder messages
-                Messages = Messages.Concat(astBuilder.Messages);
-                //build symbol table 
-                if (!astBuilder.Error)
+
+                if (!parserErrorListener.Error)
                 {
-                    var symbolTableBuilder = new ASTSymbolTableBuilder(ast);
-                    bool stBuilt = symbolTableBuilder.Build();
-                    Messages = Messages.Concat(symbolTableBuilder.Messages);
-                    //semantic check
-                    if (stBuilt)
+                    ParseTreeWalker walker = new ParseTreeWalker();
+                    //ast builder
+                    var astBuilder = new ASTBuilderListener();
+                    //build ast tree
+                    walker.Walk(astBuilder, parseTree);
+                    var ast = astBuilder.CompilationUnit;
+                    //store ast builder messages
+                    Messages = Messages.Concat(astBuilder.Messages);
+                    //build symbol table 
+                    if (!astBuilder.Error)
                     {
-                        var symbolTable = symbolTableBuilder.Symbols;
-                        var semanticChecker = new ASTSemanticChecker(ast, symbolTable);
-                        bool valid = semanticChecker.IsValid();
-                        Messages = Messages.Concat(semanticChecker.Messages);
-                        //compilation
-                        if (valid)
+                        var symbolTableBuilder = new ASTSymbolTableBuilder(ast);
+                        bool stBuilt = symbolTableBuilder.Build();
+                        Messages = Messages.Concat(symbolTableBuilder.Messages);
+                        //semantic check
+                        if (stBuilt)
                         {
-                            var codeBuilder = new CodeBuilder(ast, symbolTable);
-                            try
+                            var symbolTable = symbolTableBuilder.Symbols;
+                            var semanticChecker = new ASTSemanticChecker(ast, symbolTable);
+                            bool valid = semanticChecker.IsValid();
+                            Messages = Messages.Concat(semanticChecker.Messages);
+                            //compilation
+                            if (valid)
                             {
-                                builtAssembly = codeBuilder.Build();
-                            }
-                            catch(Exception ex)
-                            {
-                                Messages = Messages.Concat(new MessageRecord[] {
+                                var codeBuilder = new CodeBuilder(ast, symbolTable);
+                                try
+                                {
+                                    builtAssembly = codeBuilder.Build();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Messages = Messages.Concat(new MessageRecord[] {
                                     new MessageRecord(
                                             MsgCode.CompilerError,
                                             sourcePath,
@@ -86,9 +90,14 @@ namespace CmancNet.Compiler
                                             ex.ToString()
                                         )
                                 });
+                                }
                             }
                         }
                     }
+                }
+                else
+                {
+                    Messages = Messages.Concat(parserErrorListener.Messages);
                 }
             } catch(Exception ex)
             {
