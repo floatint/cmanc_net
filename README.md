@@ -76,7 +76,7 @@ end_sub
 		- [x] Not
 		- [x] Minus
 		- [x] Indexing
- - AST Processors
+ - [x] AST Processors
 	- [x] Symbol table builder
 	- [x] Semantic checker
 		- [x] Undefined variables
@@ -102,7 +102,7 @@ end_sub
 		- [x] Unary
 		- [x] Subroutine calls
 	- [ ] Loops
-		- [ ] For loop
+		- [x] For loop
 		- [x] While loop
 		- [ ] Break statement
 	- [x] Flow control
