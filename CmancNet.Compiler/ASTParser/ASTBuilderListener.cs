@@ -125,6 +125,22 @@ namespace CmancNet.Compiler.ASTParser
             _nodes.Push(new ASTVariableNode(context, _nodes.Peek()));
         }
 
+        public override void ExitNull([NotNull] CmanParser.NullContext context)
+        {
+            _nodes.Push(new ASTNullLiteralNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitTrue([NotNull] CmanParser.TrueContext context)
+        {
+            _nodes.Push(new ASTBoolLiteralNode(context, _nodes.Peek()));
+        }
+
+        
+        public override void ExitFalse([NotNull] CmanParser.FalseContext context)
+        {
+            _nodes.Push(new ASTBoolLiteralNode(context, _nodes.Peek()));
+        }
+
         //Push number literal to stack
         public override void ExitNumberLiteral([NotNull] CmanParser.NumberLiteralContext context)
         {

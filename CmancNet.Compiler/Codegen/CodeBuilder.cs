@@ -36,7 +36,7 @@ namespace CmancNet.Compiler.Codegen
                 }
             }
             //clr stack check
-            if (_emitter.StackEmpty())
+            if (!_emitter.StackEmpty())
                 throw new ApplicationException("CLR stack was corrupted");
             //builde assembly
             return _codeHolder.Assembly;
@@ -411,6 +411,7 @@ namespace CmancNet.Compiler.Codegen
             //calc condition
             _emitter.MarkLabel(condition);
             BuildExpression(whileNode.Condition);
+            _emitter.Box();
             if (_emitter.StackPeek() != typeof(bool))
                 _emitter.ToBool();
             //check condition
@@ -501,6 +502,10 @@ namespace CmancNet.Compiler.Codegen
                 BuildString(strNode);
             if (literalNode is ASTNumberLiteralNode numNode)
                 BuildDecimal(numNode);
+            if (literalNode is ASTNullLiteralNode nullNode)
+                BuildNull(nullNode);
+            if (literalNode is ASTBoolLiteralNode boolNode)
+                BuildBoolean(boolNode);
         }
 
         /// <summary>
@@ -523,6 +528,20 @@ namespace CmancNet.Compiler.Codegen
             if (numNode.Value is double dblVal)
                 _emitter.PushDouble(dblVal);
             _emitter.ToDecimal();
+        }
+
+        /// <summary>
+        /// Pushs null into stack
+        /// </summary>
+        /// <param name="nullNode">Null node</param>
+        private void BuildNull(ASTNullLiteralNode nullNode)
+        {
+            _emitter.PushNull();
+        }
+
+        private void BuildBoolean(ASTBoolLiteralNode boolNode)
+        {
+            _emitter.PushBool(boolNode.Value);
         }
 
         /// <summary>

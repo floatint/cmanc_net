@@ -134,12 +134,18 @@ namespace CmancNet.Compiler.Codegen
 
         public void JumpFalse(Label l)
         {
+            if (StackEmpty())
+                throw new InvalidOperationException("CLR stack is empty");
             _il.Emit(OpCodes.Brfalse, l);
+            _clrStack.Pop();
         }
 
         public void JumpTrue(Label l)
         {
+            if (StackEmpty())
+                throw new InvalidOperationException("CLR stack is empty");
             _il.Emit(OpCodes.Brtrue, l);
+            _clrStack.Pop();
         }
 
         public void Jump(Label l)
@@ -167,15 +173,21 @@ namespace CmancNet.Compiler.Codegen
             _clrStack.Push(val.GetType());
         }
 
-        //public void PushBool(bool val)
-        //{
-        //    if (val)
-        //        _il.Emit(OpCodes.Ldc_I4_1);
-        //    else
-        //        _il.Emit(OpCodes.Ldc_I4_0);
-        //    _clrStack.Push(val.GetType());
-        //}
-        
+        public void PushNull()
+        {
+            _il.Emit(OpCodes.Ldnull);
+            _clrStack.Push(typeof(void));
+        }
+
+        public void PushBool(bool val)
+        {
+            if (val)
+                _il.Emit(OpCodes.Ldc_I4_1);
+            else
+                _il.Emit(OpCodes.Ldc_I4_0);
+            _clrStack.Push(val.GetType());
+        }
+
         public void ToDecimal()
         {
             if (StackEmpty())

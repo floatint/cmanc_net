@@ -102,6 +102,8 @@
     <Compile Include="ASTParser\AST\ASTArgListNode.cs" />
     <Compile Include="ASTParser\AST\ASTExprListNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTAbstractBinOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTBoolLiteralNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\ASTNullLiteralNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTNumberLiteralNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTStringLiteralNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\ASTVariableNode.cs" />
