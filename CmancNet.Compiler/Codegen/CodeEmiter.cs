@@ -247,7 +247,7 @@ namespace CmancNet.Compiler.Codegen
             return _clrStack.Peek();
         }
 
-        private bool StackEmpty()
+        public bool StackEmpty()
         {
             return _clrStack.Count == 0;
         }

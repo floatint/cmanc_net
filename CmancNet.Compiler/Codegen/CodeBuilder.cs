@@ -37,6 +37,9 @@ namespace CmancNet.Compiler.Codegen
                     BuildSubroutine(s, (UserSubroutine)_symbols.FindSymbol(s.Name));
                 }
             }
+            //clr stack check
+            if (_emitter.StackEmpty())
+                throw new ApplicationException("CLR stack was corrupted");
             //builde assembly
             return _codeHolder.Assembly;
         }
@@ -76,6 +79,8 @@ namespace CmancNet.Compiler.Codegen
                 BuildIfStatement(ifNode);
             if (stmtNode is ASTWhileStatementNode whileNode)
                 BuildWhileStatement(whileNode);
+            if (stmtNode is ASTForStatementNode forNode)
+                BuildForStatement(forNode);
         }
 
         private void BuildAssignStatement(ASTAssignStatementNode assignNode)
@@ -348,6 +353,55 @@ namespace CmancNet.Compiler.Codegen
             _emitter.MarkLabel(exitWhile);
         }
 
+        private void BuildForStatement(ASTForStatementNode forNode)
+        {
+            //var nextStep = _emitter.DefineLabel();
+            var condition = _emitter.DefineLabel();
+            var exitFor = _emitter.DefineLabel();
+
+            ASTVariableNode counter = null;
+            //init counter if needed
+            if (forNode.Counter is ASTAssignStatementNode assignNode)
+            {
+                BuildStatement(assignNode);
+                counter = (ASTVariableNode)assignNode.Left;
+            }
+            else
+            {
+                counter = (ASTVariableNode)forNode.Counter;
+            }
+            //check condition
+            _emitter.MarkLabel(condition);
+            BuildExpression(forNode.Condition);
+            _emitter.JumpFalse(exitFor);
+            //body
+            if (forNode.Body != null)
+                BuildStatement(forNode.Body);
+            //_emitter.Jump(condition);
+            //inc counter
+            BuildExpression(counter);
+            _emitter.ToDecimal();
+            //build step
+            if (forNode.Step != null)
+            {
+                BuildExpression(forNode.Step);
+                if (_emitter.StackPeek() != typeof(decimal))
+                    _emitter.ToDecimal();
+            }
+            else //default step
+            {
+                _emitter.PushLong(1);
+                _emitter.ToDecimal();
+            }
+            _emitter.StaticCall(typeof(decimal), "Add", new Type[] { typeof(decimal), typeof(decimal) });
+            _emitter.Box();
+            Store(counter.Name);
+            //_emitter.StoreLocal(_context.GetLocal(counter.Name));
+            _emitter.Jump(condition);
+            //exit
+            _emitter.MarkLabel(exitFor);
+        }
+
         private void BuildVariable(ASTVariableNode varNode)
         {
             if (_context.IsLocal(varNode.Name))
@@ -376,6 +430,18 @@ namespace CmancNet.Compiler.Codegen
             if (numNode.Value is double dblVal)
                 _emitter.PushDouble(dblVal);
             _emitter.ToDecimal();
+        }
+
+        /// <summary>
+        /// Pops value from stack and store in local var or argument
+        /// </summary>
+        /// <param name="name">Variable name</param>
+        private void Store(string name)
+        {
+            if (_context.IsLocal(name))
+                _emitter.StoreLocal(_context.GetLocal(name));
+            else
+                _emitter.StoreArg(_context.GetArgID(name));
         }
 
 
