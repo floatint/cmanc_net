@@ -20,6 +20,7 @@ namespace CmancNet.Compiler.Codegen
             ILGenerator = Builder.GetILGenerator();
             _locals = new Dictionary<string, LocalBuilder>();
             _args = new Dictionary<string, int>();
+            MethodEnd = ILGenerator.DefineLabel();
             //define locals
             foreach (var l in locals)
             {
@@ -49,6 +50,7 @@ namespace CmancNet.Compiler.Codegen
 
         public ILGenerator ILGenerator { private set; get; }
         public MethodBuilder Builder { private set; get; }
+        public Label MethodEnd { private set; get; }
 
         private Dictionary<string, LocalBuilder> _locals;
         private Dictionary<string, int> _args;

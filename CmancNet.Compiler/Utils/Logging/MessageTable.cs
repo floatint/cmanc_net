@@ -52,8 +52,10 @@ namespace CmancNet.Compiler.Utils.Logging
             _messages.Add(MsgCode.EmptyBody, new Message(MsgType.Warning, "empty code block"));
             _messages.Add(MsgCode.EmptyCompileUnit, new Message(MsgType.Warning, "empty compile unit"));
             _messages.Add(MsgCode.EmptyForStep, new Message(MsgType.Warning, "empty for step statement. By default = 1"));
-            _messages.Add(MsgCode.ImplicitBoolToIntCast, new Message(MsgType.Warning, "implicit bool to int cast (false = 0, true = 1)"));
-            _messages.Add(MsgCode.ImplicitIntToBoolCast, new Message(MsgType.Warning, "implicit int to bool cast (0 = false, else true)"));
+            _messages.Add(MsgCode.ImplicitCast, new Message(MsgType.Warning, "implicit cast from '{0}' to '{1}'"));
+            _messages.Add(MsgCode.UnreachableCode, new Message(MsgType.Warning, "unreachable code detected"));
+            _messages.Add(MsgCode.InfinityLoop, new Message(MsgType.Warning, "infinity loop detected"));
+            _messages.Add(MsgCode.PermanentlyExecution, new Message(MsgType.Warning, "permanently execution detected"));
             //infos
             _messages.Add(MsgCode.CompilationSuccessful, new Message(MsgType.Info, "compilation was successfuly with {0} errors, {1} warnings"));
             _messages.Add(MsgCode.CompilationFailed, new Message(MsgType.Info, "compilation failed with {0} errors, {1} warnings"));

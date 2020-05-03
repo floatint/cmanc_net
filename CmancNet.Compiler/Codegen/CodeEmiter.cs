@@ -90,6 +90,7 @@ namespace CmancNet.Compiler.Codegen
             }
         }
 
+        //TODO: подумать над системой вызовов. Надо унифицировать
         public void VirtualCall(Type type, string methodName, Type[] args)
         {
             if (args == null)
@@ -109,35 +110,49 @@ namespace CmancNet.Compiler.Codegen
                 args = new Type[0];
             var method = type.GetMethod(methodName, args);
             _il.Emit(OpCodes.Call, method);
-            StackPop(method.GetParameters().Count());
+            StackPop(method.GetParameters().Length); //pop
             if (method.ReturnType != typeof(void))
                 _clrStack.Push(method.ReturnType);
         }
-        //TODO: Ввести StaticCall() который не будет учитывать объект в стеке
-        //ObjectCall() который учитывает объект в стеке
-        //и ObjectCallvirt() 
+
+        //for native subroutines
         public void Call(MethodInfo mi)
         {
+            int popCnt = mi.IsStatic ? mi.GetParameters().Length : mi.GetParameters().Length + 1;
             _il.Emit(OpCodes.Call, mi);
-            StackPop(mi.GetParameters().Length); //pop
+            StackPop(popCnt); //pop
             if (mi.ReturnType != typeof(void))
-                _clrStack.Push(mi.ReturnType);//PushRet(mi.ReturnType);
+                _clrStack.Push(mi.ReturnType);
         }
 
-        //User subroutine call. Without 
+        //User subroutine call. Without cleanup parameters
         public void UnwrapCall(MethodBuilder mb)
         {
             _il.Emit(OpCodes.Call, mb);
         }
 
 
-        /*public void CallVirtual(MethodInfo mi)
+        public void JumpFalse(Label l)
         {
-            _il.Emit(OpCodes.Call, mi);
-            StackPop(mi.GetParameters().Length); //pop 
-            if (mi.ReturnParameter.IsRetval)
-                PushRet(mi.ReturnParameter.GetType());
-        }*/
+            if (StackEmpty())
+                throw new InvalidOperationException("CLR stack is empty");
+            _il.Emit(OpCodes.Brfalse, l);
+            _clrStack.Pop();
+        }
+
+        public void JumpTrue(Label l)
+        {
+            if (StackEmpty())
+                throw new InvalidOperationException("CLR stack is empty");
+            _il.Emit(OpCodes.Brtrue, l);
+            _clrStack.Pop();
+        }
+
+        public void Jump(Label l)
+        {
+            _il.Emit(OpCodes.Br, l);
+        }
+
 
         public void PushString(string val)
         {
@@ -157,13 +172,36 @@ namespace CmancNet.Compiler.Codegen
             _il.Emit(OpCodes.Ldc_R8, val);
             _clrStack.Push(val.GetType());
         }
-        
+
+        public void PushNull()
+        {
+            _il.Emit(OpCodes.Ldnull);
+            _clrStack.Push(typeof(void));
+        }
+
+        public void PushBool(bool val)
+        {
+            if (val)
+                _il.Emit(OpCodes.Ldc_I4_1);
+            else
+                _il.Emit(OpCodes.Ldc_I4_0);
+            _clrStack.Push(val.GetType());
+        }
+
         public void ToDecimal()
         {
             if (StackEmpty())
                 throw new InvalidOperationException("CLR stack is empty");
             _il.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToDecimal", new Type[] { _clrStack.Pop() }));
             _clrStack.Push(typeof(decimal));
+        }
+
+        public void ToBool()
+        {
+            if (StackEmpty())
+                throw new InvalidOperationException("CLR stack is empty");
+            _il.Emit(OpCodes.Call, typeof(Convert).GetMethod("ToBoolean", new Type[] { _clrStack.Pop() }));
+            _clrStack.Push(typeof(bool));
         }
 
         public void Nop()
@@ -176,25 +214,30 @@ namespace CmancNet.Compiler.Codegen
             _il.Emit(OpCodes.Ret);
         }
 
-        //TODO: продумать
         public void IsEqual()
         {
             _il.Emit(OpCodes.Ceq);
+            StackPop(2);
             _clrStack.Push(typeof(bool));
         }
 
         public void IsGreater()
         {
             _il.Emit(OpCodes.Cgt);
+            StackPop(2);
             _clrStack.Push(typeof(bool));
         }
 
         public void IsLess()
         {
             _il.Emit(OpCodes.Clt);
+            StackPop(2);
             _clrStack.Push(typeof(bool));
         }
 
+        public Label DefineLabel() => _il.DefineLabel();
+
+        public void MarkLabel(Label l) => _il.MarkLabel(l);
 
         public int StackSize() => _clrStack.Count;
 
@@ -219,7 +262,7 @@ namespace CmancNet.Compiler.Codegen
             return _clrStack.Peek();
         }
 
-        private bool StackEmpty()
+        public bool StackEmpty()
         {
             return _clrStack.Count == 0;
         }

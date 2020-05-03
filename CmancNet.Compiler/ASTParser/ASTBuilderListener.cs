@@ -75,6 +75,7 @@ namespace CmancNet.Compiler.ASTParser
 
         public override void ExitReturnStatement([NotNull] CmanParser.ReturnStatementContext context)
         {
+            //TODO: return node пушить в любом случае. дальше обработает семантический чекер
             if (_nodes.Peek() is IASTExprNode)
             {
                 IASTExprNode expr = (IASTExprNode)_nodes.Pop();
@@ -122,6 +123,22 @@ namespace CmancNet.Compiler.ASTParser
         public override void ExitVar([NotNull] CmanParser.VarContext context)
         {
             _nodes.Push(new ASTVariableNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitNull([NotNull] CmanParser.NullContext context)
+        {
+            _nodes.Push(new ASTNullLiteralNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitTrue([NotNull] CmanParser.TrueContext context)
+        {
+            _nodes.Push(new ASTBoolLiteralNode(context, _nodes.Peek()));
+        }
+
+        
+        public override void ExitFalse([NotNull] CmanParser.FalseContext context)
+        {
+            _nodes.Push(new ASTBoolLiteralNode(context, _nodes.Peek()));
         }
 
         //Push number literal to stack
@@ -258,6 +275,7 @@ namespace CmancNet.Compiler.ASTParser
 
         }
 
+        //TODO: для !(5+2) неверно работает. Надо смотреть на контекст из которого выходим
         //Bin operators handling
         public override void ExitExpr([NotNull] CmanParser.ExprContext context)
         {
@@ -376,6 +394,44 @@ namespace CmancNet.Compiler.ASTParser
             forNode.Condition = cond;
             forNode.Step = step;
             forNode.Body = body;
+        }
+
+        public override void EnterIfStatement([NotNull] CmanParser.IfStatementContext context)
+        {
+            _nodes.Push(new ASTIfStatementNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitIfStatement([NotNull] CmanParser.IfStatementContext context)
+        {
+            ASTBodyStatementNode elseBody = null;
+            ASTBodyStatementNode trueBody = null;
+            IASTExprNode condition = null;
+            if (_nodes.Peek() is ASTBodyStatementNode)
+            {
+                var tmp = _nodes.Pop();
+                if (_nodes.Peek() is ASTBodyStatementNode)
+                {
+                    elseBody = (ASTBodyStatementNode)tmp;
+                    trueBody = (ASTBodyStatementNode)_nodes.Pop();
+                    condition = (IASTExprNode)_nodes.Pop();
+                }
+                else
+                {
+                    trueBody = (ASTBodyStatementNode)tmp;
+                    condition = (IASTExprNode)_nodes.Pop();
+                }
+            }
+            else
+            {
+                condition = (IASTExprNode)_nodes.Pop();
+                //((ASTIfStatementNode)_nodes.Peek()).Condition = condition;
+            }
+            //TODO: ifnode не привязывает к себе ноды
+            var ifNode = (ASTIfStatementNode)_nodes.Peek();
+            ifNode.Condition = condition;
+            ifNode.TrueBody = trueBody;
+            ifNode.ElseBody = elseBody;
+            return;
         }
     }
 }

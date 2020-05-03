@@ -55,9 +55,9 @@ end_sub
         - [ ] Break statement
         - [x] While loop
         - [x] For loop
-	- [ ] Flow control
+	- [x] Flow control
 		- [x] If statement
-			- [ ] Else statement
+			- [x] Else statement
     - [x] Assign statement
     - [x] Expressions
     - [x] Procedure call's
@@ -76,7 +76,7 @@ end_sub
 		- [x] Not
 		- [x] Minus
 		- [x] Indexing
- - AST Processors
+ - [x] AST Processors
 	- [x] Symbol table builder
 	- [x] Semantic checker
 		- [x] Undefined variables
@@ -102,12 +102,12 @@ end_sub
 		- [x] Unary
 		- [x] Subroutine calls
 	- [ ] Loops
-		- [ ] For loop
-		- [ ] While loop
+		- [x] For loop
+		- [x] While loop
 		- [ ] Break statement
-	- [ ] Flow control
-		- [ ] If statement
-			- [ ] Else statement
+	- [x] Flow control
+		- [x] If statement
+			- [x] Else statement
 
 ## AST parser I/O example
 

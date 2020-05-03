@@ -28,11 +28,20 @@ END_CYC
 	:	E N D '_' C Y C
 	;
 
+BREAK
+	:	B R E A K
+	;
 
+IF
+	:	I F
+	;
 
+ELSE
+	:	E L S E
+	;
 
-IDENT
-	:	('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0' .. '9')*//[a-zA-z_][a-zA-Z_0-9]*
+END_IF
+	: E N D '_' I F
 	;
 
 NULL
@@ -45,6 +54,11 @@ TRUE
 
 FALSE
 	:	'false'
+	;
+
+
+IDENT
+	:	('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '_' | '0' .. '9')*//[a-zA-z_][a-zA-Z_0-9]*
 	;
 
 STRING

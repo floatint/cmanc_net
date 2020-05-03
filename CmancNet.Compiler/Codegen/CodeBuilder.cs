@@ -22,12 +22,10 @@ namespace CmancNet.Compiler.Codegen
             _builtSubs = new Dictionary<string, MethodContext>();
         }
 
-        //public IList<string> Messages
-
         /// <summary>
-        /// Build compilation unit
+        /// Builds compilation unit
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Built assembly</returns>
         public AssemblyBuilder Build()
         {
             if (_compileUnit.Procedures != null)
@@ -37,38 +35,69 @@ namespace CmancNet.Compiler.Codegen
                     BuildSubroutine(s, (UserSubroutine)_symbols.FindSymbol(s.Name));
                 }
             }
+            //clr stack check
+            if (!_emitter.StackEmpty())
+                throw new ApplicationException("CLR stack was corrupted");
             //builde assembly
             return _codeHolder.Assembly;
         }
 
+        /// <summary>
+        /// Builds subroutine
+        /// </summary>
+        /// <param name="subNode">Subroutine node</param>
+        /// <param name="subSym">Subroutine symbol</param>
         private void BuildSubroutine(ASTSubStatementNode subNode, UserSubroutine subSym)
         {
             _context = new MethodContext(_codeHolder.GetMethodBuilder(subNode.Name, subSym), subSym.GetLocalsList());
             _emitter = new CodeEmiter(_context.ILGenerator);
             if (subNode.Body != null)
             {
-                foreach (var s in subNode.Body.Statements)
-                {
-                    BuildStatement(s);
-                }
+                BuildStatement(subNode.Body);
             }
             else
             {
                 _emitter.Nop();
             }
+            _emitter.MarkLabel(_context.MethodEnd);
             _emitter.Ret();
-            //TODO: epilog emit
             _builtSubs.Add(subNode.Name, _context); //add to built
         }
 
+        /// <summary>
+        /// Builds body statement
+        /// </summary>
+        /// <param name="bodyNode">Body statement node</param>
+        private void BuildBodyStatement(ASTBodyStatementNode bodyNode)
+        {
+            foreach (var s in bodyNode.Statements)
+                BuildStatement(s);
+        }
+
+        /// <summary>
+        /// Builds concrete statement
+        /// </summary>
+        /// <param name="stmtNode">Statement node</param>
         private void BuildStatement(IASTStatementNode stmtNode)
         {
+            if (stmtNode is ASTBodyStatementNode bodyNode)
+                BuildBodyStatement(bodyNode);
             if (stmtNode is ASTAssignStatementNode assignNode)
                 BuildAssignStatement(assignNode);
             if (stmtNode is ASTCallStatementNode callNode)
                 BuildCallStatement(callNode);
+            if (stmtNode is ASTIfStatementNode ifNode)
+                BuildIfStatement(ifNode);
+            if (stmtNode is ASTWhileStatementNode whileNode)
+                BuildWhileStatement(whileNode);
+            if (stmtNode is ASTForStatementNode forNode)
+                BuildForStatement(forNode);
         }
 
+        /// <summary>
+        /// Builds assignment statement
+        /// </summary>
+        /// <param name="assignNode">Assignment statement node</param>
         private void BuildAssignStatement(ASTAssignStatementNode assignNode)
         {
             //to dictionary assign
@@ -96,6 +125,10 @@ namespace CmancNet.Compiler.Codegen
             }
         } 
 
+        /// <summary>
+        /// Builds concrete expression
+        /// </summary>
+        /// <param name="exprNode">Expression node</param>
         private void BuildExpression(IASTExprNode exprNode)
         {
             if (exprNode is IASTLiteral literalNode)
@@ -125,6 +158,10 @@ namespace CmancNet.Compiler.Codegen
                 BuildNotOpExpr(notNode);
         }
 
+        /// <summary>
+        /// Builds concrete binary operation
+        /// </summary>
+        /// <param name="binOpExpr">Binary operation node</param>
         private void BuildBinOpExpr(IASTBinOpNode binOpExpr)
         {
             //arithm
@@ -145,6 +182,10 @@ namespace CmancNet.Compiler.Codegen
                 BuildLessOpExpr(lessNode);
         }
 
+        /// <summary>
+        /// Builds addition operator
+        /// </summary>
+        /// <param name="addNode">Addition operator node</param>
         private void BuildAddOpExpr(ASTAddOpNode addNode)
         {
             BuildExpression(addNode.Left);
@@ -153,9 +194,13 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(addNode.Right);
             if (_emitter.StackPeek() != typeof(decimal))
                 _emitter.ToDecimal();
-            _emitter.Call(typeof(decimal).GetMethod("Add", new Type[] { typeof(decimal), typeof(decimal) }));
+            _emitter.StaticCall(typeof(decimal), "Add", new Type[] { typeof(decimal), typeof(decimal) });
         }
 
+        /// <summary>
+        /// Buids subtraction operator
+        /// </summary>
+        /// <param name="subNode">Subtraction operator node</param>
         private void BuildSubOpExpr(ASTSubOpNode subNode)
         {
             BuildExpression(subNode.Left);
@@ -164,9 +209,13 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(subNode.Right);
             if (_emitter.StackPeek() != typeof(decimal))
                 _emitter.ToDecimal();
-            _emitter.Call(typeof(decimal).GetMethod("Subtract", new Type[] { typeof(decimal), typeof(decimal) }));
+            _emitter.StaticCall(typeof(decimal), "Subtract", new Type[] { typeof(decimal), typeof(decimal) });
         }
 
+        /// <summary>
+        /// Builds multiply operator
+        /// </summary>
+        /// <param name="mulNode">Multiply operator node</param>
         private void BuildMulOpExpr(ASTMulOpNode mulNode)
         {
             BuildExpression(mulNode.Left);
@@ -177,7 +226,11 @@ namespace CmancNet.Compiler.Codegen
                 _emitter.ToDecimal();
             _emitter.StaticCall(typeof(decimal), "Multiply", new Type[] { typeof(decimal), typeof(decimal)});
         }
-
+        
+        /// <summary>
+        /// Builds division operator
+        /// </summary>
+        /// <param name="divNode">Division operator node</param>
         private void BuildDivOpExpr(ASTDivOpNode divNode)
         {
             BuildExpression(divNode.Left);
@@ -189,6 +242,10 @@ namespace CmancNet.Compiler.Codegen
             _emitter.StaticCall(typeof(decimal), "Divide", new Type[] { typeof(decimal), typeof(decimal) });
         }
 
+        /// <summary>
+        /// Builds equal operator
+        /// </summary>
+        /// <param name="equalNode">Equals operator node</param>
         private void BuildEqualOpExpr(ASTEqualOpNode equalNode)
         {
             BuildExpression(equalNode.Left);
@@ -198,6 +255,10 @@ namespace CmancNet.Compiler.Codegen
             _emitter.VirtualCall(typeof(object), "Equals", new Type[] { typeof(object) });
         }
 
+        /// <summary>
+        /// Builds greater operator
+        /// </summary>
+        /// <param name="greaterNode">Greater operator node</param>
         private void BuildGreaterOpExpr(ASTGreaterOpNode greaterNode)
         {
             BuildExpression(greaterNode.Left);
@@ -211,6 +272,10 @@ namespace CmancNet.Compiler.Codegen
             _emitter.IsGreater();
         }
 
+        /// <summary>
+        /// Builds less operator
+        /// </summary>
+        /// <param name="lessNode">Less operator node</param>
         private void BuildLessOpExpr(ASTLessOpNode lessNode)
         {
             BuildExpression(lessNode.Left);
@@ -224,6 +289,10 @@ namespace CmancNet.Compiler.Codegen
             _emitter.IsLess();
         }
 
+        /// <summary>
+        /// Builds negate operator
+        /// </summary>
+        /// <param name="minusNode">Minus operator node</param>
         private void BuildMinusOpExpr(ASTMinusOpNode minusNode)
         {
             BuildExpression(minusNode.Expression);
@@ -232,6 +301,10 @@ namespace CmancNet.Compiler.Codegen
             _emitter.StaticCall(typeof(decimal), "Negate", new Type[] { typeof(decimal) });
         }
 
+        /// <summary>
+        /// Builds not operator
+        /// </summary>
+        /// <param name="notNode">Not operator node</param>
         private void BuildNotOpExpr(ASTNotOpNode notNode)
         {
             BuildExpression(notNode.Expression);
@@ -258,14 +331,13 @@ namespace CmancNet.Compiler.Codegen
             {
                 //get root object
                 BuildVariable(varNode);
-                //calc index
-                //BuildExpression(indexOp.Index);
-                //_emitter.Box();
-                //get item
-                //_emitter.InternalCallvirt(typeof(Dictionary<object, object>), "get_Item", new Type[] { typeof(object) });
             }
         }
 
+        /// <summary>
+        /// Builds call statement
+        /// </summary>
+        /// <param name="callNode">Call statement node</param>
         private void BuildCallStatement(ASTCallStatementNode callNode)
         {
             int argCnt = 0;
@@ -296,6 +368,122 @@ namespace CmancNet.Compiler.Codegen
             }
         }
 
+        /// <summary>
+        /// Builds if statement
+        /// </summary>
+        /// <param name="ifNode">If statement node</param>
+        private void BuildIfStatement(ASTIfStatementNode ifNode)
+        {
+            //define labels
+            var elseBody = _emitter.DefineLabel();
+            var exitIf = _emitter.DefineLabel();
+
+            //calc condition
+            BuildExpression(ifNode.Condition);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.ToBool();
+            //check
+            _emitter.JumpFalse(elseBody);
+            //body
+            if (ifNode.TrueBody != null)
+            {
+                BuildStatement(ifNode.TrueBody);
+                _emitter.Jump(exitIf);
+            }
+            //else body
+            _emitter.MarkLabel(elseBody);
+            if (ifNode.ElseBody != null)
+                BuildStatement(ifNode.ElseBody);
+            //exit
+            _emitter.MarkLabel(exitIf);
+        }
+
+        /// <summary>
+        /// Builds while loop statement
+        /// </summary>
+        /// <param name="whileNode">While statement node</param>
+        private void BuildWhileStatement(ASTWhileStatementNode whileNode)
+        {
+            var condition = _emitter.DefineLabel();
+            var body = _emitter.DefineLabel();
+            var exitWhile = _emitter.DefineLabel();
+
+            //calc condition
+            _emitter.MarkLabel(condition);
+            BuildExpression(whileNode.Condition);
+            _emitter.Box();
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.ToBool();
+            //check condition
+            _emitter.JumpFalse(exitWhile);
+            //body
+            if (whileNode.Body != null)
+            {
+                BuildStatement(whileNode.Body);
+                //jump back
+                _emitter.Jump(condition);
+            }
+            //while exit
+            _emitter.MarkLabel(exitWhile);
+        }
+
+        /// <summary>
+        /// Builds for loop statement
+        /// </summary>
+        /// <param name="forNode">For loop node</param>
+        private void BuildForStatement(ASTForStatementNode forNode)
+        {
+            var condition = _emitter.DefineLabel();
+            var exitFor = _emitter.DefineLabel();
+
+            ASTVariableNode counter = null;
+            //init counter if needed
+            if (forNode.Counter is ASTAssignStatementNode assignNode)
+            {
+                BuildStatement(assignNode);
+                counter = (ASTVariableNode)assignNode.Left;
+            }
+            else
+            {
+                counter = (ASTVariableNode)forNode.Counter;
+            }
+            //check condition
+            _emitter.MarkLabel(condition);
+            BuildExpression(forNode.Condition);
+            _emitter.JumpFalse(exitFor);
+            //body
+            if (forNode.Body != null)
+                BuildStatement(forNode.Body);
+            
+            //load counter
+            BuildExpression(counter);
+            _emitter.ToDecimal();
+            //build step
+            if (forNode.Step != null)
+            {
+                BuildExpression(forNode.Step);
+                if (_emitter.StackPeek() != typeof(decimal))
+                    _emitter.ToDecimal();
+            }
+            else //default step
+            {
+                _emitter.PushLong(1);
+                _emitter.ToDecimal();
+            }
+            //update counter
+            _emitter.StaticCall(typeof(decimal), "Add", new Type[] { typeof(decimal), typeof(decimal) });
+            _emitter.Box();
+            Store(counter.Name);
+            //jump to condition
+            _emitter.Jump(condition);
+            //exit
+            _emitter.MarkLabel(exitFor);
+        }
+
+        /// <summary>
+        /// Loads variable value into stack
+        /// </summary>
+        /// <param name="varNode">Variable node</param>
         private void BuildVariable(ASTVariableNode varNode)
         {
             if (_context.IsLocal(varNode.Name))
@@ -304,19 +492,35 @@ namespace CmancNet.Compiler.Codegen
                 _emitter.LoadArg(_context.GetArgID(varNode.Name));
         }
 
+        /// <summary>
+        /// Process concrete literal
+        /// </summary>
+        /// <param name="literalNode">Common literal node</param>
         private void BuildLiteral(IASTLiteral literalNode)
         {
             if (literalNode is ASTStringLiteralNode strNode)
                 BuildString(strNode);
             if (literalNode is ASTNumberLiteralNode numNode)
                 BuildDecimal(numNode);
+            if (literalNode is ASTNullLiteralNode nullNode)
+                BuildNull(nullNode);
+            if (literalNode is ASTBoolLiteralNode boolNode)
+                BuildBoolean(boolNode);
         }
 
+        /// <summary>
+        /// Pushs string into stack
+        /// </summary>
+        /// <param name="strNode">String value</param>
         private void BuildString(ASTStringLiteralNode strNode)
         {
             _emitter.PushString(strNode.Value);
         }
 
+        /// <summary>
+        /// Pushs number as decimal into stack
+        /// </summary>
+        /// <param name="numNode">Number for convert to decimal</param>
         private void BuildDecimal(ASTNumberLiteralNode numNode)
         {
             if (numNode.Value is long longVal)
@@ -326,12 +530,55 @@ namespace CmancNet.Compiler.Codegen
             _emitter.ToDecimal();
         }
 
+        /// <summary>
+        /// Pushs null into stack
+        /// </summary>
+        /// <param name="nullNode">Null node</param>
+        private void BuildNull(ASTNullLiteralNode nullNode)
+        {
+            _emitter.PushNull();
+        }
 
+        private void BuildBoolean(ASTBoolLiteralNode boolNode)
+        {
+            _emitter.PushBool(boolNode.Value);
+        }
+
+        /// <summary>
+        /// Pops value from stack and store in local var or argument
+        /// </summary>
+        /// <param name="name">Variable name</param>
+        private void Store(string name)
+        {
+            if (_context.IsLocal(name))
+                _emitter.StoreLocal(_context.GetLocal(name));
+            else
+                _emitter.StoreArg(_context.GetArgID(name));
+        }
+
+        /// <summary>
+        /// Compile unit AST root node
+        /// </summary>
         private ASTCompileUnitNode _compileUnit;
-        private SymbolTable _symbols; //top level symbol table
+        /// <summary>
+        /// Defined subroutines in current compile unit (with it's own local variables)
+        /// </summary>
+        private SymbolTable _symbols;
+        /// <summary>
+        /// Assembly holder. Contains generated code
+        /// </summary>
         private AssemblyHolder _codeHolder;
-        private CodeEmiter _emitter; //low level code emitter of current method
-        private MethodContext _context; //current method context
-        private Dictionary<string, MethodContext> _builtSubs; //built subroutines
+        /// <summary>
+        /// IL generator wrapper for current method
+        /// </summary>
+        private CodeEmiter _emitter;
+        /// <summary>
+        /// Current method context. Contains local variables, labels, etc
+        /// </summary>
+        private MethodContext _context;
+        /// <summary>
+        /// Built user's subroutines
+        /// </summary>
+        private Dictionary<string, MethodContext> _builtSubs;
     }
 }

@@ -5,29 +5,32 @@ using System.Text;
 using System.Threading.Tasks;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using CmancNet.Compiler.Utils.Logging;
 
-namespace CmancNet.Compiler.Utils
+namespace CmancNet.Compiler.Utils.Logging
 {
     class ANTLRErrorListener : BaseErrorListener
     {
-        public ANTLRErrorListener(IList<string> errorList)
+        public ANTLRErrorListener()
         {
-            _errorList = errorList;
+            _messages = new List<MessageRecord>();
         }
 
         public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e)
         {
-            string message = "{0}({1},{2}): {3}";
-            _errorList.Add(string.Format(
-                message,
-                recognizer.InputStream.SourceName,
+            _messages.Add(new MessageRecord(
+                MsgCode.CompilerError,
+                offendingSymbol.InputStream.SourceName,
                 line,
                 charPositionInLine,
                 msg
                 ));
         }
 
-        private IList<string> _errorList;
+        public IEnumerable<MessageRecord> Messages => _messages.AsEnumerable();
+        public bool Error => _messages.Any(x => x.Message.Type == MsgType.Error);
+
+        private IList<MessageRecord> _messages;
 
     }
 }
