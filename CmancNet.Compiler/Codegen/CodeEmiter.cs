@@ -90,7 +90,7 @@ namespace CmancNet.Compiler.Codegen
             }
         }
 
-
+        //TODO: подумать над системой вызовов. Надо унифицировать
         public void VirtualCall(Type type, string methodName, Type[] args)
         {
             if (args == null)
@@ -110,19 +110,19 @@ namespace CmancNet.Compiler.Codegen
                 args = new Type[0];
             var method = type.GetMethod(methodName, args);
             _il.Emit(OpCodes.Call, method);
-            StackPop(method.GetParameters().Count());
+            StackPop(method.GetParameters().Length); //pop
             if (method.ReturnType != typeof(void))
                 _clrStack.Push(method.ReturnType);
         }
-        //TODO: Ввести StaticCall() который не будет учитывать объект в стеке
-        //ObjectCall() который учитывает объект в стеке
-        //и ObjectCallvirt() 
+
+        //for native subroutines
         public void Call(MethodInfo mi)
         {
+            int popCnt = mi.IsStatic ? mi.GetParameters().Length : mi.GetParameters().Length + 1;
             _il.Emit(OpCodes.Call, mi);
-            StackPop(mi.GetParameters().Length); //pop
+            StackPop(popCnt); //pop
             if (mi.ReturnType != typeof(void))
-                _clrStack.Push(mi.ReturnType);//PushRet(mi.ReturnType);
+                _clrStack.Push(mi.ReturnType);
         }
 
         //User subroutine call. Without cleanup parameters

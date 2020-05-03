@@ -275,6 +275,7 @@ namespace CmancNet.Compiler.ASTParser
 
         }
 
+        //TODO: для !(5+2) неверно работает. Надо смотреть на контекст из которого выходим
         //Bin operators handling
         public override void ExitExpr([NotNull] CmanParser.ExprContext context)
         {

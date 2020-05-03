@@ -194,7 +194,7 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(addNode.Right);
             if (_emitter.StackPeek() != typeof(decimal))
                 _emitter.ToDecimal();
-            _emitter.Call(typeof(decimal).GetMethod("Add", new Type[] { typeof(decimal), typeof(decimal) }));
+            _emitter.StaticCall(typeof(decimal), "Add", new Type[] { typeof(decimal), typeof(decimal) });
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(subNode.Right);
             if (_emitter.StackPeek() != typeof(decimal))
                 _emitter.ToDecimal();
-            _emitter.Call(typeof(decimal).GetMethod("Subtract", new Type[] { typeof(decimal), typeof(decimal) }));
+            _emitter.StaticCall(typeof(decimal), "Subtract", new Type[] { typeof(decimal), typeof(decimal) });
         }
 
         /// <summary>
