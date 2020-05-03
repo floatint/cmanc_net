@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmancNet.Compiler.ASTParser.AST.Expressions
 {
-    class ASTBoolLiteralNode : ASTNode, IASTExprNode, IASTLiteral
+    class ASTBoolLiteralNode : ASTNode, IASTExprNode, IASTLiteral, IASTLogicOpNode
     {
         public bool Value { private set; get; }
 

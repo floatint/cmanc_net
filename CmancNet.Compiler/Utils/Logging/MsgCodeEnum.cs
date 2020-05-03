@@ -24,8 +24,11 @@ namespace CmancNet.Compiler.Utils.Logging
         EmptyBody = 2048,
         EmptyCompileUnit,
         EmptyForStep,
-        ImplicitBoolToIntCast,
-        ImplicitIntToBoolCast,
+        ImplicitCast,
+        UnreachableCode,
+        InfinityLoop,
+        PermanentlyExecution,
+
         //Info starts with 4096
         CompilationSuccessful = 4096,
         CompilationFailed,

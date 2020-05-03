@@ -7,6 +7,8 @@ using CmancNet.Compiler.ASTParser.AST;
 using CmancNet.Compiler.ASTParser.AST.Statements;
 using CmancNet.Compiler.ASTParser.AST.Expressions;
 using CmancNet.Compiler.ASTParser.AST.Expressions.Unary;
+using CmancNet.Compiler.ASTParser.AST.Expressions.Binary;
+using CmancNet.Compiler.ASTProcessors.Analysis;
 using CmancNet.Compiler.Utils.Logging;
 using CmancNet.Compiler.ASTInfo;
 
@@ -18,8 +20,6 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             _compileUnit = compileUnit;
             _symbolTable = symbolTable;
-            //Errors = new List<string>();
-            //Warnings = new List<string>();
             _messages = new List<MessageRecord>();
         }
 
@@ -55,7 +55,6 @@ namespace CmancNet.Compiler.ASTProcessors
                 CheckBody(subNode.Body);
             } else
             {
-                //Messages.Add(PackMessage(MsgCode.EmptyBody, subNode, null));
                 _messages.Add(new MessageRecord(
                     MsgCode.EmptyBody,
                     subNode.SourcePath,
@@ -78,6 +77,8 @@ namespace CmancNet.Compiler.ASTProcessors
                 CheckAssignStatement(assignNode);
             if (stmtNode is ASTCallStatementNode callNode)
                 CheckSubCall(callNode, false);
+            if (stmtNode is ASTIfStatementNode ifNode)
+                CheckIfStatement(ifNode);
             if (stmtNode is ASTWhileStatementNode whileNode)
                 CheckWhileStatement(whileNode);
             if (stmtNode is ASTForStatementNode forNode)
@@ -137,6 +138,17 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             CheckExpression(binOpNode.Left);
             CheckExpression(binOpNode.Right);
+            //equal and not equal - exception
+            if (!(binOpNode is ASTEqualOpNode))
+            {
+                CheckImplicitCast(binOpNode.Left, typeof(decimal));
+                CheckImplicitCast(binOpNode.Right, typeof(decimal));
+            }
+            else
+            {
+                CheckImplicitCast(binOpNode.Left, typeof(bool));
+                CheckImplicitCast(binOpNode.Right, typeof(bool));
+            }
         }
 
         private void CheckUnarOp(IASTUnarOpNode unarOpNode)
@@ -144,8 +156,10 @@ namespace CmancNet.Compiler.ASTProcessors
             //CheckExpression(unarOpNode.Expression);
             if (unarOpNode is ASTIndexOpNode indexOp)
                 CheckIndexOp(indexOp);
-            else
-                CheckExpression(unarOpNode.Expression);
+            if (unarOpNode is ASTNotOpNode notOp)
+                CheckNotOp(notOp);
+            if (unarOpNode is ASTMinusOpNode minusOp)
+                CheckMinusOp(minusOp);
         }
 
         private void CheckIndexOp(ASTIndexOpNode indexOpNode)
@@ -174,7 +188,22 @@ namespace CmancNet.Compiler.ASTProcessors
                 if (indexOpNode.Expression is ASTCallStatementNode callNode)
                     CheckSubCall(callNode, true);
             }
+            //TODO: null index check
             CheckExpression(indexOpNode.Index);
+        }
+
+        private void CheckNotOp(ASTNotOpNode notOp)
+        {
+            CheckExpression(notOp.Expression);
+            CheckImplicitCast(notOp.Expression, typeof(bool));
+            //CheckExpression(notOp.Expression);
+        }
+
+        private void CheckMinusOp(ASTMinusOpNode minusOp)
+        {
+            CheckExpression(minusOp.Expression);
+            CheckImplicitCast(minusOp.Expression, typeof(decimal));
+            //CheckExpression(minusOp.Expression);
         }
 
         /// <summary>
@@ -274,11 +303,108 @@ namespace CmancNet.Compiler.ASTProcessors
             }
         }
 
+        private void CheckIfStatement(ASTIfStatementNode ifNode)
+        {
+            CheckExpression(ifNode.Condition);
+            CheckImplicitCast(ifNode.Condition, typeof(bool));
+            //TODO: сначала высчитывать условие а потом смотреть тела
+            if (ASTExprHelper.IsValuable(ifNode.Condition))
+            {
+                var isTrue = Convert.ToBoolean(ASTExprHelper.GetValue(ifNode.Condition));
+                //permanetnly true
+                if (isTrue)
+                {
+                    if (ifNode.TrueBody != null)
+                    {
+                        _messages.Add(new MessageRecord(
+                            MsgCode.PermanentlyExecution,
+                            ifNode.TrueBody.SourcePath,
+                            ifNode.TrueBody.StartLine,
+                            ifNode.TrueBody.StartPos
+                            ));
+                    }
+                    if (ifNode.ElseBody != null)
+                    {
+                        _messages.Add(new MessageRecord(
+                            MsgCode.UnreachableCode,
+                            ifNode.ElseBody.SourcePath,
+                            ifNode.ElseBody.StartLine,
+                            ifNode.ElseBody.StartPos
+                            ));
+                    }
+                }
+                else //permanently false
+                {
+                    if (ifNode.TrueBody != null)
+                    {
+                        _messages.Add(new MessageRecord(
+                            MsgCode.UnreachableCode,
+                            ifNode.TrueBody.SourcePath,
+                            ifNode.TrueBody.StartLine,
+                            ifNode.TrueBody.StartPos
+                            ));
+                    }
+                    if (ifNode.ElseBody != null)
+                    {
+                        _messages.Add(new MessageRecord(
+                            MsgCode.PermanentlyExecution,
+                            ifNode.ElseBody.SourcePath,
+                            ifNode.ElseBody.StartLine,
+                            ifNode.ElseBody.StartPos
+                            ));
+                    }
+                }
+            }
+            if (ifNode.TrueBody != null)
+            {
+                CheckBody(ifNode.TrueBody);
+            }
+            if (ifNode.ElseBody != null)
+            {
+                CheckBody(ifNode.ElseBody);
+            }
+        }
+
         private void CheckWhileStatement(ASTWhileStatementNode whileNode)
         {
+            //check condition type
+            CheckImplicitCast(whileNode.Condition, typeof(bool));
+            CheckExpression(whileNode.Condition);
+            //CheckImplicitCast(whileNode.Condition, typeof(bool));            
             if (whileNode.Body != null)
             {
+                //check infinity loop or dead code
+                if (ASTExprHelper.IsValuable(whileNode.Condition))
+                {
+                    //infinity loop
+                    if (Convert.ToBoolean(ASTExprHelper.GetValue(whileNode.Condition))) {
+                        _messages.Add(new MessageRecord(
+                            MsgCode.InfinityLoop,
+                            whileNode.Body.SourcePath,
+                            whileNode.Body.StartLine,
+                            whileNode.Body.StartPos
+                            ));
+                    }
+                    else //unreachable code
+                    {
+                        _messages.Add(new MessageRecord(
+                            MsgCode.UnreachableCode,
+                            whileNode.Body.SourcePath,
+                            whileNode.Body.StartLine,
+                            whileNode.Body.StartPos
+                            ));
+                    }
+                }
+                //body check
                 CheckBody(whileNode.Body);
+            } else
+            {
+                _messages.Add(new MessageRecord(
+                    MsgCode.EmptyBody,
+                    whileNode.SourcePath,
+                    whileNode.StartLine,
+                    whileNode.StartPos
+                    ));
             }
         }
 
@@ -290,21 +416,14 @@ namespace CmancNet.Compiler.ASTProcessors
             if (forNode.Counter is ASTAssignStatementNode assignNode)
                 CheckAssignStatement(assignNode);
             //check condition
-            /*if (!(forNode.Condition is IASTCmpOpNode) && !(forNode.Condition is ASTNotOpNode))
-            {
-                string msg = "for condition statement requires only boolean operations";
-                _errors.Add(ErrorFormatter.Format((ASTNode)forNode.Condition, string.Format(msg)));
-                _error = true;
-            }
-            else
-            {
-                CheckExpression(forNode.Condition);
-            }*/
             CheckExpression(forNode.Condition);
+            CheckImplicitCast(forNode.Condition, typeof(bool));
+
             //check step if his defined
             if (forNode.Step != null)
             {
                 CheckExpression(forNode.Step);
+                CheckImplicitCast(forNode.Step, typeof(decimal));   
             }
 
             //checkbody
@@ -333,23 +452,26 @@ namespace CmancNet.Compiler.ASTProcessors
             return true;
         }
 
-        /// <summary>
-        /// Pack message into tuple for top level viewers (json, console, etc)
-        /// </summary>
-        /// <param name="code">Message code</param>
-        /// <param name="node">AST node for message location</param>
-        /// <param name="args">Message arguments</param>
-        /// <returns>Packed tuple message</returns>
-        private Tuple<MsgCode, Message, ASTNode, object[]> PackMessage(MsgCode code, ASTNode node, params object[] args)
+        private void CheckImplicitCast(IASTExprNode expr, Type type)
         {
-            return new Tuple<MsgCode, Message, ASTNode, object[]>(code, MessageTable.Get()[code], node, args);
+            var exprType = ASTExprHelper.GetExpressionType(expr);
+            if (exprType != type)
+            {
+                var tmp = (ASTNode)expr;
+                _messages.Add(new MessageRecord(
+                    MsgCode.ImplicitCast,
+                    tmp.SourcePath,
+                    tmp.StartLine,
+                    tmp.StartPos,
+                    exprType,
+                    type
+                    ));
+            }
         }
-
 
         private ASTCompileUnitNode _compileUnit;
         private SymbolTable _symbolTable;
         private UserSubroutine _currentSub;
-
         private IList<MessageRecord> _messages;
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmancNet.Compiler.ASTParser.AST.Expressions.Unary
 {
-    class ASTMinusOpNode : ASTNode, IASTUnarOpNode
+    class ASTMinusOpNode : ASTNode, IASTUnarOpNode, IASTArithmOpNode
     {
         public IASTExprNode Expression { set; get; }
 

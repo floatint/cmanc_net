@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CmancNet.Compiler.ASTParser.AST.Expressions.Binary
 {
-    class ASTSubOpNode : ASTAbstractBinOpNode
+    class ASTSubOpNode : ASTAbstractBinOpNode, IASTArithmOpNode
     {
         //public IASTExprNode Left { set; get; }
         //public IASTExprNode Right { set; get; }

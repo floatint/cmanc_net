@@ -114,8 +114,9 @@
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTMulOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTSubOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTArithmOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\IASTBinOpNode.cs" />
-    <Compile Include="ASTParser\AST\Expressions\IASTCmpOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\IASTLogicOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\IASTExprNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\IASTUnarOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Unary\ASTIndexOpNode.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="ASTParser\AST\Statements\ASTSubStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTWhileStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\IASTStatementNode.cs" />
+    <Compile Include="ASTProcessors\Analysis\ASTExprHelper.cs" />
     <Compile Include="ASTProcessors\ASTSemanticChecker.cs" />
     <Compile Include="ASTProcessors\ASTSymbolTableBuilder.cs" />
     <Compile Include="CmancCompiler.cs" />
