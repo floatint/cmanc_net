@@ -217,18 +217,21 @@ namespace CmancNet.Compiler.Codegen
         public void IsEqual()
         {
             _il.Emit(OpCodes.Ceq);
+            StackPop(2);
             _clrStack.Push(typeof(bool));
         }
 
         public void IsGreater()
         {
             _il.Emit(OpCodes.Cgt);
+            StackPop(2);
             _clrStack.Push(typeof(bool));
         }
 
         public void IsLess()
         {
             _il.Emit(OpCodes.Clt);
+            StackPop(2);
             _clrStack.Push(typeof(bool));
         }
 
