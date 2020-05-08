@@ -36,16 +36,15 @@ namespace CmancNet.Compiler.ASTProcessors
             {
                 foreach (var s in _compileUnit.Procedures)
                 {
-                    var tmp = VisitSubStatement(s);
-                    if (tmp.Key != null)
-                        Symbols.AddSymbol(tmp.Key, tmp.Value);
+                    VisitSubStatement(s);
                 }
             }
             return ErrorsCount == 0;
         }
 
-        private KeyValuePair<string, ISymbol> VisitSubStatement(ASTSubStatementNode subNode)
+        private void VisitSubStatement(ASTSubStatementNode subNode)
         {
+            //check overriding
             var existsSub = (ISubroutine)Symbols.FindSymbol(subNode.Name);
             if (existsSub != null)
             {
@@ -53,57 +52,93 @@ namespace CmancNet.Compiler.ASTProcessors
                     Messages.Add(new MessageRecord(MsgCode.NativeSubOverride, subNode.SourcePath, subNode.StartLine, subNode.StartPos, subNode.Name));
                 else
                     Messages.Add(new MessageRecord(MsgCode.UserSubOverride, subNode.SourcePath, subNode.StartLine, subNode.StartPos, subNode.Name));
-                return new KeyValuePair<string, ISymbol>();
             }
-            UserSubroutine sub = new UserSubroutine(subNode);
-            if (subNode.ArgList != null)
+            else
             {
-                foreach(var a in subNode.ArgList.Arguments)
+                UserSubroutine sub = new UserSubroutine(subNode);
+                //add arguments
+                if (subNode.ArgList != null)
                 {
-                    sub.AddLocal(a.Name, new Argument());
+                    foreach (var a in subNode.ArgList.Arguments)
+                    {
+                        sub.AddLocal(a.Name, new Argument());
+                    }
                 }
-            }
-            if (subNode.Body != null)
-            {
-                var retStmt = (ASTReturnStatementNode)subNode.Body.Statements.FirstOrDefault(x => x is ASTReturnStatementNode);
-                if ((retStmt != null) && (retStmt.Expression != null))
-                    sub.Return = true;
-                foreach (var s in subNode.Body.Statements)
+                _currentSubroutine = sub;
+                //body check
+                if (subNode.Body != null)
                 {
-                    var tmp = VisitStatement(s);
-                    if (tmp.Key != null)
-                        sub.AddLocal(tmp.Key, tmp.Value);
+                    VisitBodyStatement(subNode.Body);
                 }
+                Symbols.AddSymbol(subNode.Name, _currentSubroutine);
             }
-            return new KeyValuePair<string, ISymbol>(subNode.Name, sub);
         }
 
-        private KeyValuePair<string, ISymbol> VisitStatement(IASTStatementNode stmtNode)
+        private void VisitBodyStatement(ASTBodyStatementNode bodyNode)
         {
-            if (stmtNode is ASTAssignStatementNode asgNode)
-                return VisitAssignStatement(asgNode);
-            if (stmtNode is ASTForStatementNode forStmt)
-                return VisitForStatement(forStmt);
-            return new KeyValuePair<string, ISymbol>();
+            foreach (var s in bodyNode.Statements)
+            {
+                VisitStatement(s);
+            }
         }
 
-        private KeyValuePair<string, ISymbol> VisitAssignStatement(ASTAssignStatementNode assignNode)
+        private void VisitStatement(IASTStatementNode stmtNode)
+        {
+            if (stmtNode is ASTAssignStatementNode assignNode)
+                VisitAssignStatement(assignNode);
+            if (stmtNode is ASTForStatementNode forNode)
+                VisitForStatement(forNode);
+            if (stmtNode is ASTWhileStatementNode whileNode)
+                VisitWhileStatement(whileNode);
+            if (stmtNode is ASTIfStatementNode ifNode)
+                VisitIfStatement(ifNode);
+        }
+
+        private void VisitVariable(ASTVariableNode varNode)
+        {
+            var existsLocal = _currentSubroutine.FindLocal(varNode.Name);
+            if (existsLocal == null)
+            {
+                _currentSubroutine.AddLocal(varNode.Name, new Variable());
+            }
+        }
+
+        private void VisitAssignStatement(ASTAssignStatementNode assignNode)
         {
             if (assignNode.Left is ASTVariableNode varNode)
-                return new KeyValuePair<string, ISymbol>(varNode.Name, new Variable());
-            return new KeyValuePair<string, ISymbol>();
+                VisitVariable(varNode);
         }
 
 
-        private KeyValuePair<string, ISymbol> VisitForStatement(ASTForStatementNode forStmt)
+        private void VisitForStatement(ASTForStatementNode forStmt)
         {
             if (forStmt.Counter is ASTVariableNode varNode)
-                return new KeyValuePair<string, ISymbol>(varNode.Name, new Variable());
+                VisitVariable(varNode);
+               
             if (forStmt.Counter is ASTAssignStatementNode assignStmt)
-                return VisitAssignStatement(assignStmt);
-            return new KeyValuePair<string, ISymbol>();
+                VisitAssignStatement(assignStmt);
+
+            if (forStmt.Body != null)
+            {
+                VisitBodyStatement(forStmt.Body);
+            }
+        }
+
+        private void VisitWhileStatement(ASTWhileStatementNode whileNode)
+        {
+            if (whileNode.Body != null)
+                VisitBodyStatement(whileNode.Body);
+        }
+
+        private void VisitIfStatement(ASTIfStatementNode ifNode)
+        {
+            if (ifNode.TrueBody != null)
+                VisitBodyStatement(ifNode.TrueBody);
+            if (ifNode.ElseBody != null)
+                VisitBodyStatement(ifNode.ElseBody);
         }
 
         private ASTCompileUnitNode _compileUnit;
+        private UserSubroutine _currentSubroutine;
     }
 }
