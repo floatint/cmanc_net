@@ -71,7 +71,7 @@ end_sub
 		- [x] Equal
 		- [ ] LessOrEqual
 		- [ ] GreaterOrEqual
-		- [ ] Not equal
+		- [x] Not equal
 	- [x] Unary operators
 		- [x] Not
 		- [x] Minus
@@ -84,9 +84,12 @@ end_sub
 		- [x] Subroutine call arguments count check
 		- [x] Subroutine call return check
 		- [x] Assignment to rvalue check
+		- [x] Dead code detection
+		- [x] Implicit casts detection
+		- [x] Return statement ambiguous check
  - [ ] Codegen
-	- [ ] Subroutines
-		- [ ] Return statement
+	- [x] Subroutines
+		- [x] Return statement
 	- [x] Expressions
 		- [ ] Binary
 			- [x] Additional
@@ -98,7 +101,7 @@ end_sub
 			- [x] Greater
 			- [ ] LessOrEqual
 			- [ ] GreaterOrEqual
-			- [ ] Not equal
+			- [x] Not equal
 		- [x] Unary
 		- [x] Subroutine calls
 	- [ ] Loops

@@ -92,6 +92,8 @@ namespace CmancNet.Compiler.Codegen
                 BuildWhileStatement(whileNode);
             if (stmtNode is ASTForStatementNode forNode)
                 BuildForStatement(forNode);
+            if (stmtNode is ASTReturnStatementNode retNode)
+                BuildReturnStatement(retNode);
         }
 
         /// <summary>
@@ -176,6 +178,8 @@ namespace CmancNet.Compiler.Codegen
             //comparing
             if (binOpExpr is ASTEqualOpNode equalNode)
                 BuildEqualOpExpr(equalNode);
+            if (binOpExpr is ASTNotEqualOpNode notEqualNode)
+                BuildNotEqualOpExpr(notEqualNode);
             if (binOpExpr is ASTGreaterOpNode greaterNode)
                 BuildGreaterOpExpr(greaterNode);
             if (binOpExpr is ASTLessOpNode lessNode)
@@ -253,6 +257,17 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(equalNode.Right);
             _emitter.Box();
             _emitter.VirtualCall(typeof(object), "Equals", new Type[] { typeof(object) });
+        }
+
+        private void BuildNotEqualOpExpr(ASTNotEqualOpNode notEqualNode)
+        {
+            BuildExpression(notEqualNode.Left);
+            _emitter.Box();
+            BuildExpression(notEqualNode.Right);
+            _emitter.Box();
+            _emitter.VirtualCall(typeof(object), "Equals", new Type[] { typeof(object) });
+            _emitter.PushLong(0);
+            _emitter.IsEqual();
         }
 
         /// <summary>
@@ -478,6 +493,21 @@ namespace CmancNet.Compiler.Codegen
             _emitter.Jump(condition);
             //exit
             _emitter.MarkLabel(exitFor);
+        }
+
+        /// <summary>
+        /// Builds return statement
+        /// </summary>
+        /// <param name="retNode">Return statement node</param>
+        private void BuildReturnStatement(ASTReturnStatementNode retNode)
+        {
+            if (retNode.Expression != null)
+                BuildExpression(retNode.Expression);
+            //TODO: because all user's subroutines returns System.Object on call side
+            //and doesn't box
+            _emitter.Box();
+
+            _emitter.Jump(_context.MethodEnd);
         }
 
         /// <summary>

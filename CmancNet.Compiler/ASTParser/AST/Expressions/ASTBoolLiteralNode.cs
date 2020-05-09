@@ -10,17 +10,13 @@ namespace CmancNet.Compiler.ASTParser.AST.Expressions
     {
         public bool Value { private set; get; }
 
-        public ASTBoolLiteralNode(CmanParser.TrueContext context, ASTNode parent)
+        public ASTBoolLiteralNode(CmanParser.BoolLiteralContext context, ASTNode parent)
             : base(parent)
         {
-            Value = true;
-            SetLocation(context);
-        }
-
-        public ASTBoolLiteralNode(CmanParser.FalseContext context, ASTNode parent)
-            : base(parent)
-        {
-            Value = false;
+            if (context.TRUE() != null)
+                Value = true;
+            else
+                Value = false;
             SetLocation(context);
         }
 

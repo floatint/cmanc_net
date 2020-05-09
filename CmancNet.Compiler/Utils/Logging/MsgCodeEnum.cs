@@ -20,6 +20,7 @@ namespace CmancNet.Compiler.Utils.Logging
         TooFewArguments,
         NativeSubOverride,
         UserSubOverride,
+        AmbiguousReturn,
         //Warnings starts with 2048
         EmptyBody = 2048,
         EmptyCompileUnit,

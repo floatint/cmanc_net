@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace CmancNet.Compiler.ASTParser.AST.Expressions.Binary
 {
-    class ASTEqualOpNode : ASTAbstractBinOpNode, IASTLogicOpNode
+    class ASTNotEqualOpNode : ASTAbstractBinOpNode, IASTLogicOpNode
     {
-        public ASTEqualOpNode(CmanParser.EqualsOpContext context, ASTNode parent)
+        public ASTNotEqualOpNode(CmanParser.EqualsOpContext context, ASTNode parent)
             : base(parent)
         {
             SetLocation(context);
         }
     }
+
 }
