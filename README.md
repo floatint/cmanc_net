@@ -71,7 +71,7 @@ end_sub
 		- [x] Equal
 		- [ ] LessOrEqual
 		- [ ] GreaterOrEqual
-		- [ ] Not equal
+		- [x] Not equal
 	- [x] Unary operators
 		- [x] Not
 		- [x] Minus
@@ -101,7 +101,7 @@ end_sub
 			- [x] Greater
 			- [ ] LessOrEqual
 			- [ ] GreaterOrEqual
-			- [ ] Not equal
+			- [x] Not equal
 		- [x] Unary
 		- [x] Subroutine calls
 	- [ ] Loops

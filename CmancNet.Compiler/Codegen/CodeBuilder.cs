@@ -178,6 +178,8 @@ namespace CmancNet.Compiler.Codegen
             //comparing
             if (binOpExpr is ASTEqualOpNode equalNode)
                 BuildEqualOpExpr(equalNode);
+            if (binOpExpr is ASTNotEqualOpNode notEqualNode)
+                BuildNotEqualOpExpr(notEqualNode);
             if (binOpExpr is ASTGreaterOpNode greaterNode)
                 BuildGreaterOpExpr(greaterNode);
             if (binOpExpr is ASTLessOpNode lessNode)
@@ -255,6 +257,17 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(equalNode.Right);
             _emitter.Box();
             _emitter.VirtualCall(typeof(object), "Equals", new Type[] { typeof(object) });
+        }
+
+        private void BuildNotEqualOpExpr(ASTNotEqualOpNode notEqualNode)
+        {
+            BuildExpression(notEqualNode.Left);
+            _emitter.Box();
+            BuildExpression(notEqualNode.Right);
+            _emitter.Box();
+            _emitter.VirtualCall(typeof(object), "Equals", new Type[] { typeof(object) });
+            _emitter.PushLong(0);
+            _emitter.IsEqual();
         }
 
         /// <summary>

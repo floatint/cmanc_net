@@ -81,7 +81,7 @@ expr
 	|	expr (MUL|DIV) expr #mulOrDivOp
 	|	expr (PLUS|MINUS) expr #addOrSubOp
 	|	expr (LESS|GREATER) expr #compOp
-	|	expr (EQUAL) expr #equalsOp
+	|	expr (EQUAL|NOT_EQUAL) expr #equalsOp
 	|	LR_BRACKET expr RR_BRACKET #parenExpr
 	//atoms
 	|	var #varLiteral

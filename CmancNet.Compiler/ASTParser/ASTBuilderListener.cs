@@ -274,7 +274,10 @@ namespace CmancNet.Compiler.ASTParser
 
         public override void EnterEqualsOp([NotNull] CmanParser.EqualsOpContext context)
         {
-            _nodes.Push(new ASTEqualOpNode(context, _nodes.Peek()));
+            if (context.EQUAL() != null)
+                _nodes.Push(new ASTEqualOpNode(context, _nodes.Peek()));
+            if (context.NOT_EQUAL() != null)
+                _nodes.Push(new ASTNotEqualOpNode(context, _nodes.Peek()));
         }
 
         public override void ExitEqualsOp([NotNull] CmanParser.EqualsOpContext context)
