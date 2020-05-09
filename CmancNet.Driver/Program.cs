@@ -129,10 +129,9 @@ namespace CmancNet.Driver
                     "Source file for compilation not defined"
                     ));
             }
-            
+
             foreach (var m in messages)
-                Console.WriteLine(m);
-            return;
+                MessageRecordWriter.WriteLine(m);
         }
     }
 }
