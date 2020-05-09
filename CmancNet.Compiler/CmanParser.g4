@@ -24,7 +24,7 @@ assignStatement
 	;
 
 returnStatement
-	:	RETURN varOrExpr?
+	:	RETURN expr?
 	;
 
 ifStatement
@@ -75,83 +75,28 @@ exprList
 	;
 
 expr
-	:	null
-	|	true
-	|	false
-	|	varOrExpr
-	|	subCallStatement
-	|	stringLiteral
-	|	numberLiteral
-	
-	|	expr indexOp
-
-	|	unarOp expr
-	|	expr mulOrDivOp expr
-	|	expr addOrSubOp expr
-	|	expr compOp expr
+	:	subCallStatement #callOp
+	|	expr LS_BRACKET expr RS_BRACKET #indexOp
+	|	<assoc=right> (MINUS|NOT) expr #unarOp
+	|	expr (MUL|DIV) expr #mulOrDivOp
+	|	expr (PLUS|MINUS) expr #addOrSubOp
+	|	expr (LESS|GREATER) expr #compOp
+	|	expr (EQUAL) expr #equalsOp
+	|	LR_BRACKET expr RR_BRACKET #parenExpr
+	//atoms
+	|	var #varLiteral
+	|	NULL #null
+	|	(TRUE|FALSE) #boolLiteral
+	|	STRING #stringLiteral
+	|	(INT|HEX|FLOAT) #numberLiteral
 	;
 
-varOrExpr
-	:	var
-	|	LR_BRACKET expr RR_BRACKET
-	;
 
 var
 	:	DOLLAR name
 	;
 
 
-indexOp
-	:	LS_BRACKET expr RS_BRACKET
-	;
-
 name
 	:	IDENT
-	;
-
-
-compOp
-	:	EQUAL
-	|	NOT_EQUAL
-	|	LESS
-	|	GREATER
-	|	LESS_OR_EQUAL
-	|	GREATER_OR_EQUAL
-	;
-
-mulOrDivOp
-	:	MUL
-	|	DIV
-	;
-
-addOrSubOp
-	:	PLUS
-	|	MINUS
-	;
-
-unarOp
-	:	NOT
-	|	MINUS
-	;
-
-null
-	:	NULL
-	;
-
-true
-	:	TRUE
-	;
-
-false
-	:	FALSE
-	;
-
-numberLiteral
-	:	INT
-	|	HEX
-	|	FLOAT
-	;
-
-stringLiteral
-	:	STRING
 	;

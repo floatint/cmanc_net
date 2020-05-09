@@ -130,13 +130,7 @@ namespace CmancNet.Compiler.ASTParser
             _nodes.Push(new ASTNullLiteralNode(context, _nodes.Peek()));
         }
 
-        public override void ExitTrue([NotNull] CmanParser.TrueContext context)
-        {
-            _nodes.Push(new ASTBoolLiteralNode(context, _nodes.Peek()));
-        }
-
-        
-        public override void ExitFalse([NotNull] CmanParser.FalseContext context)
+        public override void EnterBoolLiteral([NotNull] CmanParser.BoolLiteralContext context)
         {
             _nodes.Push(new ASTBoolLiteralNode(context, _nodes.Peek()));
         }
@@ -210,134 +204,86 @@ namespace CmancNet.Compiler.ASTParser
         //Push unar operation to stack
         public override void EnterUnarOp([NotNull] CmanParser.UnarOpContext context)
         {
-            var op = context.GetChild(0);
-            if (op.GetText() == "-")
+            if (context.MINUS() != null)
                 _nodes.Push(new ASTMinusOpNode(context, _nodes.Peek()));
-            if (op.GetText() == "!")
+            if (context.NOT() != null)
                 _nodes.Push(new ASTNotOpNode(context, _nodes.Peek()));
         }
 
-        ////Pop operand of unar operation
-        //public override void ExitUnarOp([NotNull] CmanParser.UnarOpContext context)
-        //{
-        //    var expr = (IASTExprNode)_nodes.Pop();
-        //    var opNode = (IASTUnarOpNode)_nodes.Peek();
-        //    opNode.Expression = expr;
-        //    /*if (opNode is ASTMinusOpNode minusNode)
-        //        minusNode.Expression = expr;
-        //    if (opNode is ASTUnarNotOpNode notNode)
-        //        notNode.Expression = expr;*/
-        //}
+        public override void ExitUnarOp([NotNull] CmanParser.UnarOpContext context)
+        {
+            IASTUnarOpNode opNode = (IASTUnarOpNode)_nodes.ElementAt(1);
+            opNode.Expression = (IASTExprNode)_nodes.Pop();
+        }
+
 
         //Push index op to stack
         public override void EnterIndexOp([NotNull] CmanParser.IndexOpContext context)
         {
-            var indexOpNode = new ASTIndexOpNode(context, _nodes.Peek());
-            /*Возможно тут у expression нужно менять родителя
-             Можно это переложить на свойства
-             */
-            indexOpNode.Expression = (IASTExprNode)_nodes.Pop();
-            _nodes.Push(indexOpNode);
+            _nodes.Push(new ASTIndexOpNode(context, _nodes.Peek()));
         }
+
 
         //Pop index operator operand
         public override void ExitIndexOp([NotNull] CmanParser.IndexOpContext context)
         {
-            var index = (IASTExprNode)_nodes.Pop();
-            ((ASTIndexOpNode)_nodes.Peek()).Index = index;
+            ASTIndexOpNode indexOp = (ASTIndexOpNode)_nodes.ElementAt(2);
+            indexOp.Index = (IASTExprNode)_nodes.Pop();
+            indexOp.Expression = (IASTExprNode)_nodes.Pop();
+        }
+
+        public override void EnterMulOrDivOp([NotNull] CmanParser.MulOrDivOpContext context)
+        {
+            if (context.MUL() != null)
+                _nodes.Push(new ASTMulOpNode(context, _nodes.Peek()));
+            if (context.DIV() != null)
+                _nodes.Push(new ASTDivOpNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitMulOrDivOp([NotNull] CmanParser.MulOrDivOpContext context)
+        {
+            ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
         }
 
         //Push add or sub op into stack
         public override void EnterAddOrSubOp([NotNull] CmanParser.AddOrSubOpContext context)
         {
-            if (context.GetText() == "-")
+            if (context.MINUS() != null)
                 _nodes.Push(new ASTSubOpNode(context, _nodes.Peek()));
-            if (context.GetText() == "+")
+            if (context.PLUS() != null)
                 _nodes.Push(new ASTAddOpNode(context, _nodes.Peek()));
         }
 
-        public override void EnterMulOrDivOp([NotNull] CmanParser.MulOrDivOpContext context)
+        public override void ExitAddOrSubOp([NotNull] CmanParser.AddOrSubOpContext context)
         {
-            if (context.GetText() == "/")
-                _nodes.Push(new ASTDivOpNode(context, _nodes.Peek()));
-            if (context.GetText() == "*")
-                _nodes.Push(new ASTMulOpNode(context, _nodes.Peek()));
+            ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
         }
+
 
         public override void EnterCompOp([NotNull] CmanParser.CompOpContext context)
         {
-            if (context.GetText() == "<")
+            if (context.LESS() != null)
                 _nodes.Push(new ASTLessOpNode(context, _nodes.Peek()));
-            if (context.GetText() == ">")
+            if (context.GREATER() != null)
                 _nodes.Push(new ASTGreaterOpNode(context, _nodes.Peek()));
-            if (context.GetText() == "==")
-                _nodes.Push(new ASTEqualOpNode(context, _nodes.Peek()));
-
         }
 
-        //TODO: для !(5+2) неверно работает. Надо смотреть на контекст из которого выходим
-        //Bin operators handling
-        public override void ExitExpr([NotNull] CmanParser.ExprContext context)
+        public override void ExitCompOp([NotNull] CmanParser.CompOpContext context)
         {
-            var t = context.GetText();
-            //var op = _nodes.LastOrDefault(x => x is ASTAddOpNode || x is ASTSubOpNode);
-            var op = _nodes.ElementAt(1); //get op node
-            if (op is IASTBinOpNode binOpNode)
-            {
-                if (binOpNode.Left == null && binOpNode.Right == null)
-                {
-                    var right = (IASTExprNode)_nodes.Pop();
-                    _nodes.Pop();
-                    var left = (IASTExprNode)_nodes.Pop();
-                    binOpNode.Left = left;
-                    binOpNode.Right = right;
-                    _nodes.Push(op);
-                }
-            }
-            if (op is IASTUnarOpNode unarOpNode)
-            {
-                unarOpNode.Expression = (IASTExprNode)_nodes.Pop();
-            }
-            /*if (op is ASTAddOpNode addNode)
-            {
-                var right = (IASTExprNode)_nodes.Pop();
-                _nodes.Pop();
-                var left = (IASTExprNode)_nodes.Pop();
-                addNode.Left = left;
-                addNode.Right = right;
-                _nodes.Push(op);
-            }
-            if (op is ASTSubOpNode subNode)
-            {
-                var right = (IASTExprNode)_nodes.Pop();
-                _nodes.Pop();
-                var left = (IASTExprNode)_nodes.Pop();
-                subNode.Left = left;
-                subNode.Right = right;
-                _nodes.Push(op);
-            }
-            if (op is ASTLessCmpOpNode lessCmpNode)
-            {
-                var right = (IASTExprNode)_nodes.Pop();
-                _nodes.Pop();
-                var left = (IASTExprNode)_nodes.Pop();
-                lessCmpNode.Left = left;
-                lessCmpNode.Right = right;
-                _nodes.Push(op);
-            }
-            if (op is ASTGreaterCmpOpNode greaterCmpNode)
-            {
-                var right = (IASTExprNode)_nodes.Pop();
-                _nodes.Pop();
-                var left = (IASTExprNode)_nodes.Pop();
-                greaterCmpNode.Left = left;
-                greaterCmpNode.Right = right;
-                _nodes.Push(op);
-            }*/
-
+            ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
         }
 
-        //
+        public override void EnterEqualsOp([NotNull] CmanParser.EqualsOpContext context)
+        {
+            _nodes.Push(new ASTEqualOpNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitEqualsOp([NotNull] CmanParser.EqualsOpContext context)
+        {
+            ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
+        }
+
+        
         public override void EnterWhileStatement([NotNull] CmanParser.WhileStatementContext context)
         {
             _nodes.Push(new ASTWhileStatementNode(context, _nodes.Peek()));
@@ -358,7 +304,6 @@ namespace CmancNet.Compiler.ASTParser
         public override void EnterForStatement([NotNull] CmanParser.ForStatementContext context)
         {
             _nodes.Push(new ASTForStatementNode(context, _nodes.Peek()));
-            //base.EnterForStatement(context);
         }
 
         public override void ExitForStatement([NotNull] CmanParser.ForStatementContext context)
@@ -432,6 +377,12 @@ namespace CmancNet.Compiler.ASTParser
             ifNode.TrueBody = trueBody;
             ifNode.ElseBody = elseBody;
             return;
+        }
+
+        private void ProcessBinOp(IASTBinOpNode binOpNode)
+        {
+            binOpNode.Right = (IASTExprNode)_nodes.Pop();
+            binOpNode.Left = (IASTExprNode)_nodes.Pop();
         }
     }
 }

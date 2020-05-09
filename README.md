@@ -84,6 +84,8 @@ end_sub
 		- [x] Subroutine call arguments count check
 		- [x] Subroutine call return check
 		- [x] Assignment to rvalue check
+		- [x] Dead code detection
+		- [x] Implicit casts detection
  - [ ] Codegen
 	- [ ] Subroutines
 		- [ ] Return statement

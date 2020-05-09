@@ -8,7 +8,7 @@ namespace CmancNet.Compiler.ASTParser.AST.Expressions.Binary
 {
     class ASTEqualOpNode : ASTAbstractBinOpNode, IASTLogicOpNode
     {
-        public ASTEqualOpNode(CmanParser.CompOpContext context, ASTNode parent)
+        public ASTEqualOpNode(CmanParser.EqualsOpContext context, ASTNode parent)
             : base(parent)
         {
             SetLocation(context);
