@@ -92,6 +92,8 @@ namespace CmancNet.Compiler.Codegen
                 BuildWhileStatement(whileNode);
             if (stmtNode is ASTForStatementNode forNode)
                 BuildForStatement(forNode);
+            if (stmtNode is ASTReturnStatementNode retNode)
+                BuildReturnStatement(retNode);
         }
 
         /// <summary>
@@ -478,6 +480,21 @@ namespace CmancNet.Compiler.Codegen
             _emitter.Jump(condition);
             //exit
             _emitter.MarkLabel(exitFor);
+        }
+
+        /// <summary>
+        /// Builds return statement
+        /// </summary>
+        /// <param name="retNode">Return statement node</param>
+        private void BuildReturnStatement(ASTReturnStatementNode retNode)
+        {
+            if (retNode.Expression != null)
+                BuildExpression(retNode.Expression);
+            //TODO: because all user's subroutines returns System.Object on call side
+            //and doesn't box
+            _emitter.Box();
+
+            _emitter.Jump(_context.MethodEnd);
         }
 
         /// <summary>

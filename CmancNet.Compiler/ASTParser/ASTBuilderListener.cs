@@ -75,7 +75,6 @@ namespace CmancNet.Compiler.ASTParser
 
         public override void ExitReturnStatement([NotNull] CmanParser.ReturnStatementContext context)
         {
-            //TODO: return node пушить в любом случае. дальше обработает семантический чекер
             if (_nodes.Peek() is IASTExprNode)
             {
                 IASTExprNode expr = (IASTExprNode)_nodes.Pop();

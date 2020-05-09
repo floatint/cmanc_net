@@ -83,6 +83,8 @@ namespace CmancNet.Compiler.ASTProcessors
                 CheckWhileStatement(whileNode);
             if (stmtNode is ASTForStatementNode forNode)
                 CheckForStatement(forNode);
+            if (stmtNode is ASTReturnStatementNode retNode)
+                CheckReturnStatement(retNode);
         }
 
         private void CheckAssignStatement(ASTAssignStatementNode assignNode)
@@ -96,8 +98,6 @@ namespace CmancNet.Compiler.ASTProcessors
                     assignNode.StartPos,
                     null
                     ));
-                //Messages.Add(PackMessage(MsgCode.RvalueAssign, assignNode, null));
-                //Errors.Add(MessageFormatter.Format((ASTNode)assignNode.Left, MsgCode.RvalueAssign, null));
             }
             else
                 CheckExpression(assignNode.Left);
@@ -114,7 +114,6 @@ namespace CmancNet.Compiler.ASTProcessors
                 CheckBinOp(binOpNode);
             if (exprNode is IASTUnarOpNode unarOpNode)
                 CheckUnarOp(unarOpNode);
-
         }
 
         private void CheckVariable(ASTVariableNode varNode)
@@ -129,8 +128,6 @@ namespace CmancNet.Compiler.ASTProcessors
                     varNode.StartPos,
                     varNode.Name
                     ));
-                //Messages.Add(PackMessage(MsgCode.UndefinedVariable, varNode, varNode.Name));
-                //Errors.Add(MessageFormatter.Format(varNode, MsgCode.UndefinedVariable, varNode.Name));
             }
         }
 
@@ -153,7 +150,6 @@ namespace CmancNet.Compiler.ASTProcessors
 
         private void CheckUnarOp(IASTUnarOpNode unarOpNode)
         {
-            //CheckExpression(unarOpNode.Expression);
             if (unarOpNode is ASTIndexOpNode indexOp)
                 CheckIndexOp(indexOp);
             if (unarOpNode is ASTNotOpNode notOp)
@@ -176,8 +172,6 @@ namespace CmancNet.Compiler.ASTProcessors
                     indexOpNode.StartPos,
                     null
                     ));
-                //Messages.Add(PackMessage(MsgCode.RvalueIndexing, indexOpNode, null));
-                //Errors.Add(MessageFormatter.Format(indexOpNode, MsgCode.RvalueIndexing, null));
             }
             else
             {
@@ -196,14 +190,12 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             CheckExpression(notOp.Expression);
             CheckImplicitCast(notOp.Expression, typeof(bool));
-            //CheckExpression(notOp.Expression);
         }
 
         private void CheckMinusOp(ASTMinusOpNode minusOp)
         {
             CheckExpression(minusOp.Expression);
             CheckImplicitCast(minusOp.Expression, typeof(decimal));
-            //CheckExpression(minusOp.Expression);
         }
 
         /// <summary>
@@ -224,8 +216,6 @@ namespace CmancNet.Compiler.ASTProcessors
                     callNode.StartPos,
                     callNode.ProcedureName
                     ));
-                //Messages.Add(PackMessage(MsgCode.UndefinedSub, callNode, callNode.ProcedureName));
-                //Errors.Add(MessageFormatter.Format(callNode, MsgCode.UndefinedSub, callNode.ProcedureName));
             }
             else
             {
@@ -241,8 +231,6 @@ namespace CmancNet.Compiler.ASTProcessors
                             callNode.StartPos,
                             callNode.ProcedureName
                             ));
-                        //Messages.Add(PackMessage(MsgCode.ReturnNotFound, callNode, callNode.ProcedureName));
-                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.ReturnNotFound, callNode.ProcedureName));
                     }
                 }
 
@@ -260,8 +248,6 @@ namespace CmancNet.Compiler.ASTProcessors
                             argCnt,
                             callNode.Arguments.Children.Count
                             ));
-                        //Messages.Add(PackMessage(MsgCode.TooFewArguments, callNode, argCnt, callNode.Arguments.Children.Count));
-                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.TooFewArguments, argCnt, callNode.Arguments.Children.Count));
                     }
                     if (argCnt < callNode.Arguments.Children.Count)
                     {
@@ -273,9 +259,6 @@ namespace CmancNet.Compiler.ASTProcessors
                             argCnt,
                             callNode.Arguments.Children.Count
                             ));
-                        //Messages.Add(PackMessage(MsgCode.TooManyArguments, callNode, argCnt, callNode.Arguments.Children.Count));
-                        //string msg = "too many arguments, {0} required, but {1} found";
-                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.TooManyArguments, argCnt, callNode.Arguments.Children.Count));
                     }
                     //check arguments
                     foreach(var a in callNode.Arguments.Expressions)
@@ -295,9 +278,6 @@ namespace CmancNet.Compiler.ASTProcessors
                            argCnt,
                            0
                            ));
-                        //Messages.Add(PackMessage(MsgCode.TooFewArguments, callNode, argCnt, 0));
-                        //string msg = "too few arguments, {0} required, but {1} found";
-                        //Errors.Add(MessageFormatter.Format(callNode, MsgCode.TooFewArguments, argCnt, 0));
                     }
                 }
             }
@@ -430,6 +410,12 @@ namespace CmancNet.Compiler.ASTProcessors
             if (forNode.Body != null)
                 CheckBody(forNode.Body);
 
+        }
+
+        private void CheckReturnStatement(ASTReturnStatementNode retNode)
+        {
+            if (retNode.Expression != null)
+                CheckExpression(retNode.Expression);
         }
 
 

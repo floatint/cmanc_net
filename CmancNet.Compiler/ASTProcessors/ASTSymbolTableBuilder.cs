@@ -92,6 +92,8 @@ namespace CmancNet.Compiler.ASTProcessors
                 VisitWhileStatement(whileNode);
             if (stmtNode is ASTIfStatementNode ifNode)
                 VisitIfStatement(ifNode);
+            if (stmtNode is ASTReturnStatementNode retNode)
+                VisitReturnStatement(retNode);
         }
 
         private void VisitVariable(ASTVariableNode varNode)
@@ -138,6 +140,52 @@ namespace CmancNet.Compiler.ASTProcessors
                 VisitBodyStatement(ifNode.ElseBody);
         }
 
+        private void VisitReturnStatement(ASTReturnStatementNode retNode)
+        {
+            //first ret statement
+            if (_hasRet == null)
+                if (retNode.Expression != null)
+                {
+                    _hasRet = true;
+                    _currentSubroutine.Return = true;                    
+                }
+                else
+                    _hasRet = false;
+            else //after first
+            {
+                //already return value
+                if ((bool)_hasRet)
+                {
+                    if (retNode.Expression == null)
+                    {
+                        Messages.Add(new MessageRecord(
+                            MsgCode.AmbiguousReturn,
+                            retNode.SourcePath,
+                            retNode.StartLine,
+                            retNode.StartPos,
+                            "value",
+                            "void"
+                            ));
+                    }
+                }
+                else //no value return
+                {
+                    if (retNode.Expression != null)
+                    {
+                        Messages.Add(new MessageRecord(
+                            MsgCode.AmbiguousReturn,
+                            retNode.SourcePath,
+                            retNode.StartLine,
+                            retNode.StartPos,
+                            "void",
+                            "value"
+                            ));
+                    }
+                }
+            }   
+        }
+
+        private object _hasRet; //helper for return validation
         private ASTCompileUnitNode _compileUnit;
         private UserSubroutine _currentSubroutine;
     }

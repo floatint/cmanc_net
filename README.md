@@ -86,9 +86,10 @@ end_sub
 		- [x] Assignment to rvalue check
 		- [x] Dead code detection
 		- [x] Implicit casts detection
+		- [x] Return statement ambiguous check
  - [ ] Codegen
-	- [ ] Subroutines
-		- [ ] Return statement
+	- [x] Subroutines
+		- [x] Return statement
 	- [x] Expressions
 		- [ ] Binary
 			- [x] Additional

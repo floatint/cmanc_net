@@ -48,6 +48,7 @@ namespace CmancNet.Compiler.Utils.Logging
             _messages.Add(MsgCode.TooFewArguments, new Message(MsgType.Error, "too many arguments, {0} required, but {1} found"));
             _messages.Add(MsgCode.NativeSubOverride, new Message(MsgType.Error, "native subroutine \'{0}\' override"));
             _messages.Add(MsgCode.UserSubOverride, new Message(MsgType.Error, "subroutine \'{0}\' override"));
+            _messages.Add(MsgCode.AmbiguousReturn, new Message(MsgType.Error, "ambiguous return statement. expected {0}, but {1} found"));
             //warnings
             _messages.Add(MsgCode.EmptyBody, new Message(MsgType.Warning, "empty code block"));
             _messages.Add(MsgCode.EmptyCompileUnit, new Message(MsgType.Warning, "empty compile unit"));
