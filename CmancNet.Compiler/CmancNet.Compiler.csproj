@@ -111,7 +111,11 @@
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTDivOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTEqualOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTGreaterOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTGreaterOrEqualOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTLessOrEqualOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTLogicAndOpNode.cs" />
+    <Compile Include="ASTParser\AST\Expressions\Binary\ASTLogicOrOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTMulOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTNotEqualOpNode.cs" />
     <Compile Include="ASTParser\AST\Expressions\Binary\ASTSubOpNode.cs" />
@@ -126,6 +130,7 @@
     <Compile Include="ASTParser\AST\Expressions\IASTLiteral.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTAssignStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTBodyStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTBreakStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTForStatementNode.cs" />

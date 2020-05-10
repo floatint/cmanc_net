@@ -20,6 +20,7 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             _compileUnit = compileUnit;
             _symbolTable = symbolTable;
+            _inLoop = false;
             _messages = new List<MessageRecord>();
         }
 
@@ -85,6 +86,8 @@ namespace CmancNet.Compiler.ASTProcessors
                 CheckForStatement(forNode);
             if (stmtNode is ASTReturnStatementNode retNode)
                 CheckReturnStatement(retNode);
+            if (stmtNode is ASTBreakStatementNode breakNode)
+                CheckBreakStatement(breakNode);
         }
 
         private void CheckAssignStatement(ASTAssignStatementNode assignNode)
@@ -135,7 +138,31 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             CheckExpression(binOpNode.Left);
             CheckExpression(binOpNode.Right);
-            //equal and not equal - exception
+            if (binOpNode is IASTArithmOpNode arithmOpNode)
+            {
+                CheckImplicitCast(binOpNode.Left, typeof(decimal));
+                CheckImplicitCast(binOpNode.Right, typeof(decimal));
+            }
+            else
+            {
+                if ((binOpNode is ASTLessOpNode) ||
+                    (binOpNode is ASTLessOrEqualOpNode) ||
+                    (binOpNode is ASTGreaterOpNode) ||
+                    (binOpNode is ASTGreaterOrEqualOpNode))
+                {
+                    CheckImplicitCast(binOpNode.Left, typeof(decimal));
+                    CheckImplicitCast(binOpNode.Right, typeof(decimal));
+                }
+                
+                if ((binOpNode is ASTLogicAndOpNode) ||
+                    (binOpNode is ASTLogicOrOpNode)
+                    )
+                {
+                    CheckImplicitCast(binOpNode.Left, typeof(bool));
+                    CheckImplicitCast(binOpNode.Right, typeof(bool));
+                }
+            }
+            /*//equal and not equal - exception
             if (!(binOpNode is ASTEqualOpNode))
             {
                 CheckImplicitCast(binOpNode.Left, typeof(decimal));
@@ -145,7 +172,7 @@ namespace CmancNet.Compiler.ASTProcessors
             {
                 CheckImplicitCast(binOpNode.Left, typeof(bool));
                 CheckImplicitCast(binOpNode.Right, typeof(bool));
-            }
+            }*/
         }
 
         private void CheckUnarOp(IASTUnarOpNode unarOpNode)
@@ -376,7 +403,9 @@ namespace CmancNet.Compiler.ASTProcessors
                     }
                 }
                 //body check
+                _inLoop = true;
                 CheckBody(whileNode.Body);
+                _inLoop = false;
             } else
             {
                 _messages.Add(new MessageRecord(
@@ -408,7 +437,11 @@ namespace CmancNet.Compiler.ASTProcessors
 
             //checkbody
             if (forNode.Body != null)
+            {
+                _inLoop = true;
                 CheckBody(forNode.Body);
+                _inLoop = false;
+            }
 
         }
 
@@ -416,6 +449,17 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             if (retNode.Expression != null)
                 CheckExpression(retNode.Expression);
+        }
+
+        private void CheckBreakStatement(ASTBreakStatementNode breakNode)
+        {
+            if (!_inLoop)
+                _messages.Add(new MessageRecord(
+                    MsgCode.BreakNotAllowed,
+                    breakNode.SourcePath,
+                    breakNode.StartLine,
+                    breakNode.StartPos
+                    ));
         }
 
 
@@ -458,6 +502,7 @@ namespace CmancNet.Compiler.ASTProcessors
         private ASTCompileUnitNode _compileUnit;
         private SymbolTable _symbolTable;
         private UserSubroutine _currentSub;
+        private bool _inLoop;
         private IList<MessageRecord> _messages;
     }
 }
