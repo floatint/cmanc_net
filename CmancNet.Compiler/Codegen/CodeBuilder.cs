@@ -446,8 +446,11 @@ namespace CmancNet.Compiler.Codegen
             }
             if (symbol is UserSubroutine userSub)
             {
-                var m = _builtSubs[callNode.ProcedureName].Builder;
-                _emitter.UnwrapCall(m);
+                _builtSubs.TryGetValue(callNode.ProcedureName, out MethodContext m);
+                if (m == null)
+                    m = _context;
+                //var m = _builtSubs[callNode.ProcedureName].Builder;
+                _emitter.UnwrapCall(m.Builder);
                 //hand handling because type not built
                 _emitter.StackPop(userSub.ArgumentsCount);
                 if (userSub.Return)
@@ -578,10 +581,12 @@ namespace CmancNet.Compiler.Codegen
         private void BuildReturnStatement(ASTReturnStatementNode retNode)
         {
             if (retNode.Expression != null)
+            {
                 BuildExpression(retNode.Expression);
-            //TODO: because all user's subroutines returns System.Object on call side
-            //and doesn't box
-            _emitter.Box();
+                //TODO: because all user's subroutines returns System.Object on call side
+                //and doesn't box
+                _emitter.Box();
+            }
 
             _emitter.Jump(_context.MethodEnd);
         }
