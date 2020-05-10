@@ -265,6 +265,10 @@ namespace CmancNet.Compiler.ASTParser
                 _nodes.Push(new ASTLessOpNode(context, _nodes.Peek()));
             if (context.GREATER() != null)
                 _nodes.Push(new ASTGreaterOpNode(context, _nodes.Peek()));
+            if (context.LESS_OR_EQUAL() != null)
+                _nodes.Push(new ASTLessOrEqualOpNode(context, _nodes.Peek()));
+            if (context.GREATER_OR_EQUAL() != null)
+                _nodes.Push(new ASTGreaterOrEqualOpNode(context, _nodes.Peek()));
         }
 
         public override void ExitCompOp([NotNull] CmanParser.CompOpContext context)

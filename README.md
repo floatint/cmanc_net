@@ -61,7 +61,7 @@ end_sub
     - [x] Assign statement
     - [x] Expressions
     - [x] Procedure call's
-	- [ ] Binary operators
+	- [x] Binary operators
 		- [x] Additional
 		- [x] Substraction
 		- [x] Multiply
@@ -69,8 +69,8 @@ end_sub
 		- [x] Less
 		- [x] Greater
 		- [x] Equal
-		- [ ] LessOrEqual
-		- [ ] GreaterOrEqual
+		- [x] LessOrEqual
+		- [x] GreaterOrEqual
 		- [x] Not equal
 	- [x] Unary operators
 		- [x] Not
@@ -91,7 +91,7 @@ end_sub
 	- [x] Subroutines
 		- [x] Return statement
 	- [x] Expressions
-		- [ ] Binary
+		- [x] Binary
 			- [x] Additional
 			- [x] Substraction
 			- [x] Multiply
@@ -99,8 +99,8 @@ end_sub
 			- [x] Equal
 			- [x] Less
 			- [x] Greater
-			- [ ] LessOrEqual
-			- [ ] GreaterOrEqual
+			- [x] LessOrEqual
+			- [x] GreaterOrEqual
 			- [x] Not equal
 		- [x] Unary
 		- [x] Subroutine calls

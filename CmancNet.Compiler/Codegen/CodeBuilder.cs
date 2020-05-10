@@ -184,6 +184,10 @@ namespace CmancNet.Compiler.Codegen
                 BuildGreaterOpExpr(greaterNode);
             if (binOpExpr is ASTLessOpNode lessNode)
                 BuildLessOpExpr(lessNode);
+            if (binOpExpr is ASTLessOrEqualOpNode lessOrEqNode)
+                BuildLessOrEqualOpExpr(lessOrEqNode);
+            if (binOpExpr is ASTGreaterOrEqualOpNode greaterOrEqNode)
+                BuildGreaterOrEqualOpExpr(greaterOrEqNode);
         }
 
         /// <summary>
@@ -302,6 +306,44 @@ namespace CmancNet.Compiler.Codegen
             _emitter.StaticCall(typeof(decimal), "Compare", new Type[] { typeof(decimal), typeof(decimal) });
             _emitter.PushLong(0);
             _emitter.IsLess();
+        }
+
+        /// <summary>
+        /// Builds less or equal operator
+        /// </summary>
+        /// <param name="lessOrEqNode">Less or equal operator node</param>
+        private void BuildLessOrEqualOpExpr(ASTLessOrEqualOpNode lessOrEqNode)
+        {
+            BuildExpression(lessOrEqNode.Left);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            BuildExpression(lessOrEqNode.Right);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            _emitter.StaticCall(typeof(decimal), "Compare", new Type[] { typeof(decimal), typeof(decimal) });
+            _emitter.PushLong(0);
+            _emitter.IsGreater();
+            _emitter.PushLong(0);
+            _emitter.IsEqual();
+        }
+
+        /// <summary>
+        /// Builds greater or equal operator
+        /// </summary>
+        /// <param name="greaterOrEqNode">Greater or equal operator node</param>
+        private void BuildGreaterOrEqualOpExpr(ASTGreaterOrEqualOpNode greaterOrEqNode)
+        {
+            BuildExpression(greaterOrEqNode.Left);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            BuildExpression(greaterOrEqNode.Right);
+            if (_emitter.StackPeek() != typeof(decimal))
+                _emitter.ToDecimal();
+            _emitter.StaticCall(typeof(decimal), "Compare", new Type[] { typeof(decimal), typeof(decimal) });
+            _emitter.PushLong(0);
+            _emitter.IsLess();
+            _emitter.PushLong(0);
+            _emitter.IsEqual();
         }
 
         /// <summary>
