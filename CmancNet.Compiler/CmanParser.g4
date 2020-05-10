@@ -16,7 +16,7 @@ subStatement
 	;
 
 bodyStatement
-	:	((assignStatement | whileStatement | ifStatement | forStatement | subCallStatement | returnStatement) NEWLINE+)+
+	:	((assignStatement | whileStatement | ifStatement | forStatement | subCallStatement | returnStatement | breakStatement) NEWLINE+)+
 	;
 
 assignStatement
@@ -25,6 +25,10 @@ assignStatement
 
 returnStatement
 	:	RETURN expr?
+	;
+
+breakStatement
+	:	BREAK
 	;
 
 ifStatement

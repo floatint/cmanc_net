@@ -366,6 +366,11 @@ namespace CmancNet.Compiler.ASTParser
             forNode.Body = body;
         }
 
+        public override void EnterBreakStatement([NotNull] CmanParser.BreakStatementContext context)
+        {
+            _nodes.Push(new ASTBreakStatementNode(context, _nodes.Peek()));
+        }
+
         public override void EnterIfStatement([NotNull] CmanParser.IfStatementContext context)
         {
             _nodes.Push(new ASTIfStatementNode(context, _nodes.Peek()));

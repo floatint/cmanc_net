@@ -20,6 +20,7 @@ namespace CmancNet.Compiler.Codegen
             _symbols = symbolTable;
             _codeHolder = new AssemblyHolder(compileUnit.Name);
             _builtSubs = new Dictionary<string, MethodContext>();
+            _loopsEnds = new Stack<Label>();
         }
 
         /// <summary>
@@ -94,6 +95,8 @@ namespace CmancNet.Compiler.Codegen
                 BuildForStatement(forNode);
             if (stmtNode is ASTReturnStatementNode retNode)
                 BuildReturnStatement(retNode);
+            if (stmtNode is ASTBreakStatementNode breakNode)
+                BuildBreakStatement(breakNode);
         }
 
         /// <summary>
@@ -501,12 +504,14 @@ namespace CmancNet.Compiler.Codegen
             //check condition
             _emitter.JumpFalse(exitWhile);
             //body
+            _loopsEnds.Push(exitWhile);
             if (whileNode.Body != null)
             {
                 BuildStatement(whileNode.Body);
                 //jump back
                 _emitter.Jump(condition);
             }
+            _loopsEnds.Pop();
             //while exit
             _emitter.MarkLabel(exitWhile);
         }
@@ -536,8 +541,10 @@ namespace CmancNet.Compiler.Codegen
             BuildExpression(forNode.Condition);
             _emitter.JumpFalse(exitFor);
             //body
+            _loopsEnds.Push(exitFor);
             if (forNode.Body != null)
                 BuildStatement(forNode.Body);
+            _loopsEnds.Pop();
             
             //load counter
             BuildExpression(counter);
@@ -577,6 +584,15 @@ namespace CmancNet.Compiler.Codegen
             _emitter.Box();
 
             _emitter.Jump(_context.MethodEnd);
+        }
+
+        /// <summary>
+        /// Builds break statement
+        /// </summary>
+        /// <param name="breakNode">Break statement node</param>
+        private void BuildBreakStatement(ASTBreakStatementNode breakNode)
+        {
+            _emitter.Jump(_loopsEnds.Peek());
         }
 
         /// <summary>
@@ -638,6 +654,10 @@ namespace CmancNet.Compiler.Codegen
             _emitter.PushNull();
         }
 
+        /// <summary>
+        /// Pushs bool value into stack
+        /// </summary>
+        /// <param name="boolNode"></param>
         private void BuildBoolean(ASTBoolLiteralNode boolNode)
         {
             _emitter.PushBool(boolNode.Value);
@@ -679,5 +699,9 @@ namespace CmancNet.Compiler.Codegen
         /// Built user's subroutines
         /// </summary>
         private Dictionary<string, MethodContext> _builtSubs;
+        /// <summary>
+        /// Loops exit label stack
+        /// </summary>
+        private Stack<Label> _loopsEnds;
     }
 }

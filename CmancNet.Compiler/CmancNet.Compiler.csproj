@@ -130,6 +130,7 @@
     <Compile Include="ASTParser\AST\Expressions\IASTLiteral.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTAssignStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTBodyStatementNode.cs" />
+    <Compile Include="ASTParser\AST\Statements\ASTBreakStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCallStatementNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTCompileUnitNode.cs" />
     <Compile Include="ASTParser\AST\Statements\ASTForStatementNode.cs" />

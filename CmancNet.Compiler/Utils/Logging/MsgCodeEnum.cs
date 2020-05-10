@@ -21,6 +21,7 @@ namespace CmancNet.Compiler.Utils.Logging
         NativeSubOverride,
         UserSubOverride,
         AmbiguousReturn,
+        BreakNotAllowed,
         //Warnings starts with 2048
         EmptyBody = 2048,
         EmptyCompileUnit,

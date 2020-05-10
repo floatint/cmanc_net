@@ -45,14 +45,14 @@ end_sub
 
 
 ### TODO list:
- - [ ] AST Parser
+ - [x] AST Parser
     - [x] Compilation unit
     - [x] Procedure statement
         - [x] Arguments list
         - [x] Return statement
     - [x] Body statement
-    - [ ] Loops
-        - [ ] Break statement
+    - [x] Loops
+        - [x] Break statement
         - [x] While loop
         - [x] For loop
 	- [x] Flow control
@@ -89,7 +89,7 @@ end_sub
 		- [x] Dead code detection
 		- [x] Implicit casts detection
 		- [x] Return statement ambiguous check
- - [ ] Codegen
+ - [x] Codegen
 	- [x] Subroutines
 		- [x] Return statement
 	- [x] Expressions
@@ -108,10 +108,10 @@ end_sub
 			- [x] Logic OR
 		- [x] Unary
 		- [x] Subroutine calls
-	- [ ] Loops
+	- [x] Loops
 		- [x] For loop
 		- [x] While loop
-		- [ ] Break statement
+		- [x] Break statement
 	- [x] Flow control
 		- [x] If statement
 			- [x] Else statement
