@@ -72,6 +72,8 @@ end_sub
 		- [x] LessOrEqual
 		- [x] GreaterOrEqual
 		- [x] Not equal
+		- [x] Logic AND
+		- [x] Logic OR
 	- [x] Unary operators
 		- [x] Not
 		- [x] Minus
@@ -102,6 +104,8 @@ end_sub
 			- [x] LessOrEqual
 			- [x] GreaterOrEqual
 			- [x] Not equal
+			- [x] Logic AND
+			- [x] Logic OR
 		- [x] Unary
 		- [x] Subroutine calls
 	- [ ] Loops

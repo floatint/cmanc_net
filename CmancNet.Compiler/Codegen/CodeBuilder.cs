@@ -188,6 +188,11 @@ namespace CmancNet.Compiler.Codegen
                 BuildLessOrEqualOpExpr(lessOrEqNode);
             if (binOpExpr is ASTGreaterOrEqualOpNode greaterOrEqNode)
                 BuildGreaterOrEqualOpExpr(greaterOrEqNode);
+            //logic
+            if (binOpExpr is ASTLogicAndOpNode logicAndNode)
+                BuildLogicAndOpExpr(logicAndNode);
+            if (binOpExpr is ASTLogicOrOpNode logicOrNode)
+                BuildLogicOrOpExpr(logicOrNode);
         }
 
         /// <summary>
@@ -344,6 +349,28 @@ namespace CmancNet.Compiler.Codegen
             _emitter.IsLess();
             _emitter.PushLong(0);
             _emitter.IsEqual();
+        }
+
+        private void BuildLogicAndOpExpr(ASTLogicAndOpNode logicAndNode)
+        {
+            BuildExpression(logicAndNode.Left);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.StaticCall(typeof(Convert), "ToBoolean", new Type[] { _emitter.StackPeek() });
+            BuildExpression(logicAndNode.Right);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.StaticCall(typeof(Convert), "ToBoolean", new Type[] { _emitter.StackPeek() });
+            _emitter.LogicAnd();
+        }
+
+        private void BuildLogicOrOpExpr(ASTLogicOrOpNode logicOrNode)
+        {
+            BuildExpression(logicOrNode.Left);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.StaticCall(typeof(Convert), "ToBoolean", new Type[] { _emitter.StackPeek() });
+            BuildExpression(logicOrNode.Right);
+            if (_emitter.StackPeek() != typeof(bool))
+                _emitter.StaticCall(typeof(Convert), "ToBoolean", new Type[] { _emitter.StackPeek() });
+            _emitter.LogicOr();
         }
 
         /// <summary>

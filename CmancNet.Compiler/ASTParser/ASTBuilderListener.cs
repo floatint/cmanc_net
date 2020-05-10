@@ -289,7 +289,26 @@ namespace CmancNet.Compiler.ASTParser
             ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
         }
 
-        
+        public override void EnterLogicAnd([NotNull] CmanParser.LogicAndContext context)
+        {
+            _nodes.Push(new ASTLogicAndOpNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitLogicAnd([NotNull] CmanParser.LogicAndContext context)
+        {
+            ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
+        }
+
+        public override void EnterLogicOr([NotNull] CmanParser.LogicOrContext context)
+        {
+            _nodes.Push(new ASTLogicOrOpNode(context, _nodes.Peek()));
+        }
+
+        public override void ExitLogicOr([NotNull] CmanParser.LogicOrContext context)
+        {
+            ProcessBinOp((IASTBinOpNode)_nodes.ElementAt(2));
+        }
+
         public override void EnterWhileStatement([NotNull] CmanParser.WhileStatementContext context)
         {
             _nodes.Push(new ASTWhileStatementNode(context, _nodes.Peek()));

@@ -235,6 +235,20 @@ namespace CmancNet.Compiler.Codegen
             _clrStack.Push(typeof(bool));
         }
 
+        public void LogicOr()
+        {
+            _il.Emit(OpCodes.Or);
+            StackPop(2);
+            _clrStack.Push(typeof(bool));
+        }
+
+        public void LogicAnd()
+        {
+            _il.Emit(OpCodes.And);
+            StackPop(2);
+            _clrStack.Push(typeof(bool));
+        }
+
         public Label DefineLabel() => _il.DefineLabel();
 
         public void MarkLabel(Label l) => _il.MarkLabel(l);

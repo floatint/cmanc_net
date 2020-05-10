@@ -135,7 +135,31 @@ namespace CmancNet.Compiler.ASTProcessors
         {
             CheckExpression(binOpNode.Left);
             CheckExpression(binOpNode.Right);
-            //equal and not equal - exception
+            if (binOpNode is IASTArithmOpNode arithmOpNode)
+            {
+                CheckImplicitCast(binOpNode.Left, typeof(decimal));
+                CheckImplicitCast(binOpNode.Right, typeof(decimal));
+            }
+            else
+            {
+                if ((binOpNode is ASTLessOpNode) ||
+                    (binOpNode is ASTLessOrEqualOpNode) ||
+                    (binOpNode is ASTGreaterOpNode) ||
+                    (binOpNode is ASTGreaterOrEqualOpNode))
+                {
+                    CheckImplicitCast(binOpNode.Left, typeof(decimal));
+                    CheckImplicitCast(binOpNode.Right, typeof(decimal));
+                }
+                
+                if ((binOpNode is ASTLogicAndOpNode) ||
+                    (binOpNode is ASTLogicOrOpNode)
+                    )
+                {
+                    CheckImplicitCast(binOpNode.Left, typeof(bool));
+                    CheckImplicitCast(binOpNode.Right, typeof(bool));
+                }
+            }
+            /*//equal and not equal - exception
             if (!(binOpNode is ASTEqualOpNode))
             {
                 CheckImplicitCast(binOpNode.Left, typeof(decimal));
@@ -145,7 +169,7 @@ namespace CmancNet.Compiler.ASTProcessors
             {
                 CheckImplicitCast(binOpNode.Left, typeof(bool));
                 CheckImplicitCast(binOpNode.Right, typeof(bool));
-            }
+            }*/
         }
 
         private void CheckUnarOp(IASTUnarOpNode unarOpNode)
